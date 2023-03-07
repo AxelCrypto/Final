@@ -13,6 +13,7 @@ Learning-Bitcoin-from-the-Command-Line
 Pipfile
 Pipfile
 .log
+Pipfile.lock
 
 
 
