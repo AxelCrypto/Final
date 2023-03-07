@@ -2,6 +2,19 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.ipynb
+.ipynb_checkpoints
+.vscode
+__pycache__
+data
+*.csv
+*.txt
+Learning-Bitcoin-from-the-Command-Line
+Pipfile
+Pipfile
+.log
+
+
 
 # C extensions
 *.so
