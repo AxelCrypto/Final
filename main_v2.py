@@ -1,23 +1,15 @@
+import sys
 import pandas as pd
 import streamlit as st
 from functions.candlestick_v2 import *
 from functions.get_btc import btc
-import sys
 import numpy as np
-import sys
 from get_merge_btc_M2s import *
 from functions.patterns import *
-from functions.on_chain import glassnode, on_chain_df
+from functions.on_chain import *
 
 
-
-sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/Final')
-try: 
-    df_btc = pd.read_csv('data/datos/btc.csv')
-except: 
-    df_btc = btc()
-    df_btc.to_csv('data/datos/btc.csv')
-
+df_btc = btc()
 
 st.set_page_config(
     page_title="Bitcoin's inside",
@@ -334,13 +326,9 @@ elif categorie == 'Macro':
 
 
 elif categorie == 'On-Chain':
-    try:
-        df = on_chain_df(onchain, metrics)
-        st.header(f'You are looking at `{metrics}` from the category **{onchain}**')
-        st.table(df.tail())
-    except: 
-        st.header(f'`{metrics}`est indisponible pour le moment')
-
+    df = on_chain_merge(onchain, metrics)
+    st.header(f'You are looking at `{metrics}` from the category **{onchain}**')
+    st.table(df.tail())
 
 
     

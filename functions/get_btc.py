@@ -8,7 +8,8 @@ from datetime import datetime
 # define your btc function here
 def btc():
     try:
-        df = pd.read_csv('../data/datos/btc.csv')
+        df = pd.read_csv('data/datos/btc.csv')
+        return df
     except:
         url = "https://www.bitstamp.net/api/v2/ohlc/btcusd/"
         timeframe = 86400
@@ -35,4 +36,5 @@ def btc():
         df.columns = [e.capitalize() for e in df.columns]
         df = df.sort_index(ascending = True)
         df.to_csv('../data/datos/btc.csv')
-    return df
+
+        return df
