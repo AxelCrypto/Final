@@ -11,10 +11,12 @@ from functions.on_chain import glassnode, on_chain_df
 
 
 
-
-sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/streamlit')
-btc = btc()
-df_btc = pd.DataFrame(btc)
+sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/Final')
+try: 
+    df_btc = pd.read_csv('data/datos/btc.csv')
+except: 
+    df_btc = btc()
+    df_btc.to_csv('data/datos/btc.csv')
 
 
 st.set_page_config(
@@ -313,8 +315,7 @@ if categorie == 'Technique':
         else : 
            st.plotly_chart(get_candlestick_plot_EHMA(df, False, 'btc'),
             use_container_width=True)     
-
-        
+     
 
 
 elif categorie == 'Macro':
