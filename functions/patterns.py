@@ -1,5 +1,5 @@
 import numpy as np
-import yfinance as yf
+#import yfinance as yf
 from typing import Tuple
 from scipy.optimize import minimize, LinearConstraint
 

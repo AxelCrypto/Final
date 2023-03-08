@@ -7,6 +7,7 @@ import numpy as np
 import sys
 from get_merge_btc_M2s import *
 from functions.patterns import *
+from functions.on_chain import glassnode
 
 
 
@@ -30,6 +31,21 @@ st.set_page_config(
 )
 
 
+#Options download
+ind = pd.read_csv('data/free_indicators_glassnode.csv')
+dic = ind[['category','metric']]
+addresses = dic.metric[dic.category == 'addresses'].values
+mining = dic.metric[dic.category == 'mining'].values
+transactions = dic.metric[dic.category == 'transactions'].values
+fees = dic.metric[dic.category == 'fees'].values
+indicators = dic.metric[dic.category == 'indicators'].values
+blockchain = dic.metric[dic.category == 'blockchain'].values
+supply = dic.metric[dic.category == 'supply'].values
+market = dic.metric[dic.category == 'market'].values
+institutions = dic.metric[dic.category == 'institutions'].values
+signals = dic.metric[dic.category == 'signals'].values
+categories = list(ind.category)
+
 ## Sidebar options
 
 # titre sidebar
@@ -37,32 +53,57 @@ st.sidebar.header('Dashboard')
 
 
 #st.sidebar.subheader('Données')
-categorie = st.sidebar.selectbox("**catégorie**",('Technique','Macro', 'On-Chain')) 
-
+categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'On-Chain'))
 
 with st.sidebar.form("Indicateurs"):
-   st.write("Selectionnez")
-   if categorie == 'Technique':
-    indicateur = st.selectbox('Indicateurs techniques ', ('Prix','Bull-Market Support Bands', 'EHMA')) 
-   elif categorie == 'Macro':
-    indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire','DXY')) 
-   elif categorie == 'On-Chain':
-    indicateur = st.selectbox('Indicateurs On-Chain', ('LT vs ST','MVRV', 'Realised Price')) 
+    st.write("Selectionnez")
+    if categorie == 'Technique':
+        indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA'))
+    elif categorie == 'Macro':
+        indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
+        
+    elif categorie == 'On-Chain':
+        indicateur = st.selectbox('Catégorie', (sorted(set(categories))))
 
 
-   days_to_plot = st.slider(
-    'Nombre de jours', 
-    min_value = 1,
-    max_value = len(df_btc),
-    value = len(df_btc))
-   
-   checkbox_val = st.checkbox("Logarithmic")
+    days_to_plot = st.slider(
+        'Nombre de jours',
+        min_value=1,
+        max_value=len(df_btc),
+        value=len(df_btc)
+    )
 
-   # Every form must have a submit button.
-   submitted = st.form_submit_button("Envoyer")
-   if submitted:
-       st.write('indicateur', indicateur,"slider", days_to_plot, "checkbox", checkbox_val)
+    checkbox_val = st.checkbox("Logarithmic")
 
+    # Every form must have a submit button.
+    submitted = st.form_submit_button("Envoyer")
+
+    if submitted:
+        if categorie == 'On-Chain':
+            if indicateur == 'addresses':
+                metrics = st.sidebar.selectbox("**metrics**", addresses)
+            elif indicateur == 'blockchain':
+                metrics = st.sidebar.selectbox("**metrics**", blockchain)
+            elif indicateur == 'mining':
+                metrics = st.sidebar.selectbox("**metrics**", mining)
+            elif indicateur == 'transactions':
+                metrics = st.sidebar.selectbox("**metrics**", transactions)
+            elif indicateur == 'fees':
+                metrics = st.sidebar.selectbox("**metrics**", fees)
+            elif indicateur == 'indicators':
+                metrics = st.sidebar.selectbox("**metrics**", indicators)
+            elif indicateur == 'blockchain':
+                metrics = st.sidebar.selectbox("**metrics**", blockchain)
+
+            elif indicateur == 'supply':
+                metrics = st.sidebar.selectbox("**metrics**", supply)
+            elif indicateur == 'market':
+                metrics = st.sidebar.selectbox("**metrics**", market)
+            elif indicateur == 'institutions':
+                metrics = st.sidebar.selectbox("**metrics**", institutions)
+            elif indicateur == 'signals':
+                metrics = st.sidebar.selectbox("**metrics**", signals)
+            else: 'euuh'
 
 st.sidebar.markdown('''
 ---
@@ -90,60 +131,7 @@ if categorie == 'Technique':
         else : 
            st.plotly_chart(get_candlestick_plot(df, False, 'btc'),
             use_container_width=True)            
-
-    elif indicateur == 'Bull-Market Support Bands': 
-        st.header('Bitcoin `Bull-Market Support Bands`')
-
-
-        df = df_btc.copy()
-        df['20w_sma'] = df['Close'].rolling(140).mean()
-        df['21w_ema'] = df['Close'].ewm(span=21, adjust=False).mean()
-        df = df[-days_to_plot:]
-
-        # Determine the y-axis type
-        if checkbox_val == True:
-            st.plotly_chart(
-            get_candlestick_plot_ma(df, True, 'btc' ),
-            use_container_width=True)   
-            
-
-        else : 
-           st.plotly_chart(get_candlestick_plot_ma(df, False, 'btc'),
-            use_container_width=True)            
-
-    elif indicateur == 'EHMA': 
-        st.header('Bitcoin `EHMA`')
-
-        df = df_btc.copy()
-        df = df[-days_to_plot:]
-
-        # Determine the y-axis type
-        if checkbox_val == True:
-            st.plotly_chart(
-            get_candlestick_plot_EHMA(df, True, 'btc' ),
-            use_container_width=True)   
-            
-        else : 
-           st.plotly_chart(get_candlestick_plot_EHMA(df, False, 'btc'),
-            use_container_width=True)     
            
-elif categorie == 'Macro':
-    if indicateur == 'Masse Monétaire': 
-        st.header('Bitcoin vs `M2`')
-        # importing Merged DF (BTC and M2s) 
-
-        df = merged_btc_M2s()
-        merged = pd.DataFrame(df)
-
-        df = df_btc.copy()
-        df = df[-days_to_plot:]
-
-        st.plotly_chart(z_score(merged, 'M2_Fed_and_ECB') ,use_container_width=True)
-
-
-
-if categorie == 'Technique':
-    if indicateur == 'Prix':    
         c1, c2 = st.columns(2)
         with c1:
             df = df_btc.copy()
@@ -278,3 +266,60 @@ if categorie == 'Technique':
             
 
             st.plotly_chart(fig ,use_container_width=False)
+
+    elif indicateur == 'Bull-Market Support Bands': 
+        st.header('Bitcoin `Bull-Market Support Bands`')
+
+
+        df = df_btc.copy()
+        df['20w_sma'] = df['Close'].rolling(140).mean()
+        df['21w_ema'] = df['Close'].ewm(span=21, adjust=False).mean()
+        df = df[-days_to_plot:]
+
+        # Determine the y-axis type
+        if checkbox_val == True:
+            st.plotly_chart(
+            get_candlestick_plot_ma(df, True, 'btc' ),
+            use_container_width=True)   
+            
+
+        else : 
+           st.plotly_chart(get_candlestick_plot_ma(df, False, 'btc'),
+            use_container_width=True)            
+
+    elif indicateur == 'EHMA': 
+        st.header('Bitcoin `EHMA`')
+
+        df = df_btc.copy()
+        df = df[-days_to_plot:]
+
+        # Determine the y-axis type
+        if checkbox_val == True:
+            st.plotly_chart(
+            get_candlestick_plot_EHMA(df, True, 'btc' ),
+            use_container_width=True)   
+            
+        else : 
+           st.plotly_chart(get_candlestick_plot_EHMA(df, False, 'btc'),
+            use_container_width=True)     
+
+        
+
+
+elif categorie == 'Macro':
+    if indicateur == 'Masse Monétaire': 
+        st.header('Bitcoin vs `M2`')
+        # importing Merged DF (BTC and M2s) 
+
+        df = merged_btc_M2s()
+        merged = pd.DataFrame(df)
+
+        df = df_btc.copy()
+        df = df[-days_to_plot:]
+
+        st.plotly_chart(z_score(merged, 'M2_Fed_and_ECB') ,use_container_width=True)
+
+
+
+#elif categorie == 'On-Chain':
+   
