@@ -7,8 +7,7 @@ import numpy as np
 import sys
 from get_merge_btc_M2s import *
 from functions.patterns import *
-from functions.on_chain import glassnode
-
+from functions.on_chain import glassnode, on_chain_df
 
 
 
@@ -55,55 +54,67 @@ st.sidebar.header('Dashboard')
 #st.sidebar.subheader('Données')
 categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'On-Chain'))
 
-with st.sidebar.form("Indicateurs"):
-    st.write("Selectionnez")
-    if categorie == 'Technique':
-        indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA'))
-    elif categorie == 'Macro':
-        indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
-        
-    elif categorie == 'On-Chain':
-        indicateur = st.selectbox('Catégorie', (sorted(set(categories))))
+if categorie == 'Technique' or categorie == 'Macro':
+
+    with st.sidebar.form("Indicateurs"):
+        #st.write("Selectionnez")
+        if categorie == 'Technique':
+            indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA'))
+        elif categorie == 'Macro':
+            indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
 
 
-    days_to_plot = st.slider(
+
+        days_to_plot = st.slider(
+            'Nombre de jours',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+
+        checkbox_val = st.checkbox("Logarithmic")
+
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("**Envoyer**")
+
+else:
+    onchain = st.sidebar.selectbox('onchain', (sorted(set(categories))))
+    with st.sidebar.form("On-Chain"):
+        if onchain == 'addresses':
+            metrics = st.selectbox("**metrics**", addresses)
+        elif onchain == 'blockchain':
+            metrics = st.selectbox("**metrics**", blockchain)
+        elif onchain == 'mining':
+            metrics = st.selectbox("**metrics**", mining)
+        elif onchain == 'transactions':
+            metrics = st.selectbox("**metrics**", transactions)
+        elif onchain == 'fees':
+            metrics = st.selectbox("**metrics**", fees)
+        elif onchain == 'indicators':
+            metrics = st.selectbox("**metrics**", indicators)
+        elif onchain == 'supply':
+            metrics = st.selectbox("**metrics**", supply)
+        elif onchain == 'market':
+            metrics = st.selectbox("**metrics**", market)
+        elif onchain == 'institutions':
+            metrics = st.selectbox("**metrics**", institutions)
+        elif onchain == 'signals':
+            metrics = st.selectbox("**metrics**", signals)
+
+        days_to_plot = st.slider(
         'Nombre de jours',
         min_value=1,
         max_value=len(df_btc),
         value=len(df_btc)
-    )
+        )
 
-    checkbox_val = st.checkbox("Logarithmic")
+        checkbox_val = st.checkbox("Logarithmic")
 
-    # Every form must have a submit button.
-    submitted = st.form_submit_button("Envoyer")
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("**Envoyer**")
 
-    if submitted:
-        if categorie == 'On-Chain':
-            if indicateur == 'addresses':
-                metrics = st.sidebar.selectbox("**metrics**", addresses)
-            elif indicateur == 'blockchain':
-                metrics = st.sidebar.selectbox("**metrics**", blockchain)
-            elif indicateur == 'mining':
-                metrics = st.sidebar.selectbox("**metrics**", mining)
-            elif indicateur == 'transactions':
-                metrics = st.sidebar.selectbox("**metrics**", transactions)
-            elif indicateur == 'fees':
-                metrics = st.sidebar.selectbox("**metrics**", fees)
-            elif indicateur == 'indicators':
-                metrics = st.sidebar.selectbox("**metrics**", indicators)
-            elif indicateur == 'blockchain':
-                metrics = st.sidebar.selectbox("**metrics**", blockchain)
 
-            elif indicateur == 'supply':
-                metrics = st.sidebar.selectbox("**metrics**", supply)
-            elif indicateur == 'market':
-                metrics = st.sidebar.selectbox("**metrics**", market)
-            elif indicateur == 'institutions':
-                metrics = st.sidebar.selectbox("**metrics**", institutions)
-            elif indicateur == 'signals':
-                metrics = st.sidebar.selectbox("**metrics**", signals)
-            else: 'euuh'
+            
 
 st.sidebar.markdown('''
 ---
@@ -210,7 +221,7 @@ if categorie == 'Technique':
             df = df[(df['Date'] > max(df['Date']) - one_year * pd.offsets.Day())]
             df = df.reset_index(drop=True)
 
-            frame = 120
+            frame = 250
 
             # Get another df of the dates where we draw the support/resistance lines
             df_trend = df[(df.loc[:, 'Date'] > max(df['Date']) - frame * pd.offsets.Day()) & (df.loc[:, 'Date'] < max(df.loc[:, 'Date']))]
@@ -321,5 +332,14 @@ elif categorie == 'Macro':
 
 
 
-#elif categorie == 'On-Chain':
-   
+elif categorie == 'On-Chain':
+    try:
+        df = on_chain_df(onchain, metrics)
+        st.header(f'You are looking at `{metrics}` from the category **{onchain}**')
+        st.table(df.tail())
+    except: 
+        st.header(f'`{metrics}`est indisponible pour le moment')
+
+
+
+    
