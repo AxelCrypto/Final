@@ -104,6 +104,7 @@ else:
         checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
         ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
 
+        checkbox_zscore = st.checkbox("Activer le Z-Score")
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("**Envoyer**")
@@ -330,26 +331,35 @@ elif categorie == 'On-Chain':
     df = on_chain_merge(onchain, metrics)
     st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
     df = df[-days_to_plot:]
-    Zscore = True
-    if Zscore == True:
-        st.plotly_chart(on_chain_viz_zscore_test(df, True, True, ma, onchain, metrics, True ),
+
+    if checkbox_val == True :
+        if checkbox_val_metric == True:
+            if checkbox_zscore == True:
+                st.plotly_chart(on_chain_viz_zscore_test(df, True, True, ma, onchain, metrics,True ),
+                use_container_width=True)   
+            else: st.plotly_chart(on_chain_viz_zscore_test(df, True, True, ma, onchain, metrics,False ),
+                use_container_width=True)   
+        
+        elif checkbox_val_metric == False:
+            if checkbox_zscore == True:
+                st.plotly_chart(on_chain_viz_zscore_test(df, True, False,ma, onchain, metrics,True ),
+                    use_container_width=True)   
+            else:
+                st.plotly_chart(on_chain_viz_zscore_test(df, True, False,ma, onchain, metrics,False ),
                     use_container_width=True)   
 
-    else:
-        if checkbox_val == True :
-            if checkbox_val_metric == True:
-                st.plotly_chart(on_chain_viz(df, True, True, ma, onchain, metrics ),
-                    use_container_width=True)   
-            
-            elif checkbox_val_metric == False:
-                st.plotly_chart(on_chain_viz(df, True, False,ma, onchain, metrics ),
-                    use_container_width=True)   
-            
-        elif checkbox_val == False:
-            if checkbox_val_metric == True:
-                st.plotly_chart(on_chain_viz(df, False, True, ma,onchain, metrics ),
+    elif checkbox_val == False:
+        if checkbox_val_metric == True:
+            if checkbox_zscore == True:
+                st.plotly_chart(on_chain_viz_zscore_test(df, False, True, ma,onchain, metrics,True ),
                 use_container_width=True)   
-            else : 
-                st.plotly_chart(on_chain_viz(df, False, False, ma, onchain, metrics),
-                    use_container_width=True)            
-            
+            else: st.plotly_chart(on_chain_viz_zscore_test(df, False, True, ma,onchain, metrics,False ),
+                use_container_width=True)   
+
+        else : 
+            if checkbox_zscore == True:
+                st.plotly_chart(on_chain_viz_zscore_test(df, False, False, ma,onchain, metrics,True ),
+                use_container_width=True)   
+            else: st.plotly_chart(on_chain_viz_zscore_test(df, False, False, ma,onchain, metrics,False ),
+                use_container_width=True)       
+        
