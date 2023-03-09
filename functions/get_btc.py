@@ -4,12 +4,17 @@ import requests
 import json
 import time
 from datetime import datetime
+import os
 
-# define your btc function here
+
+Path = os.path.dirname( os.path.abspath(__file__))
 def btc():
     try:
-        df = pd.read_csv('data/datos/btc.csv')
+        df = pd.read_csv(Path+'/../data/datos/btc.csv', index_col= 'timestamp')
+       # df.set_index('timestamp', drop = True, inplace=True)
+       # df.index = pd.to_datetime(df.index)
         return df
+
     except:
         url = "https://www.bitstamp.net/api/v2/ohlc/btcusd/"
         timeframe = 86400
@@ -32,9 +37,9 @@ def btc():
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
         df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].astype(float)
 
-        df = df.set_index('timestamp')
+        df.set_index('timestamp',drop=True, inplace = True)
         df.columns = [e.capitalize() for e in df.columns]
-        df = df.sort_index(ascending = True)
-        df.to_csv('../data/datos/btc.csv')
+        df.sort_index(ascending = True, inplace= True)
+        df.to_csv(Path+'/../data/datos/btc.csv')
 
         return df

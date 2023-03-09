@@ -21,23 +21,36 @@ def glassnode(url):
 
 def on_chain_df(categorie, metric):
     try:
-        df = pd.read_csv(f'data/datos/{metric}.csv')
+        df = pd.read_csv(f'data/datos/{categorie}_{metric}.csv')
     except:
         url =  '/v1/metrics/' + str(categorie)  +'/' + str(metric)
         df = glassnode(url).copy()
         df.set_index('timestamp',inplace = True)
         df.columns = ['metric']
-        df.to_csv(f'data/datos/{metric}.csv')
+        df.to_csv(f'data/datos/{categorie}_{metric}.csv')
     return df
 
+import os
+
+Path = os.path.dirname( os.path.abspath(__file__))
 
 def on_chain_merge(categorie, metric):
-    df = on_chain_df(categorie, metric).copy()
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df_btc = btc().copy()
-    df_merged = df_btc.merge(df, left_index=True, right_on='timestamp')
-    
-    return df_merged
+    try:
+        df_merged = pd.read_csv(Path+'/../data/datos/merged_{categorie}_{metric}.csv', index_col= 'timestamp')
+        return df_merged
+    except:
+        df = on_chain_df(categorie, metric).copy()
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df.set_index('timestamp', drop = True, inplace = True)
+        df_btc = btc().copy()
+        df_btc.index = pd.to_datetime(df_btc.index)
+        df_merged = df_btc.merge(df, left_index=True, right_index=True)
+        try:
+            df_merged['timestamp'] = pd.to_datetime(df_merged['timestamp'])
+            df_merged.set_index('timestamp',drop=True, inplace = True)
+        except:pass
+        df_merged.to_csv(Path+f'/../data/datos/merged_{categorie}_{metric}.csv')
+
+        return df_merged
 
 
-    

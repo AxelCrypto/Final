@@ -7,7 +7,7 @@ import numpy as np
 from get_merge_btc_M2s import *
 from functions.patterns import *
 from functions.on_chain import *
-
+from functions.on_chain_viz import *
 
 df_btc = btc()
 
@@ -23,12 +23,11 @@ st.set_page_config(
     }
 )
 
-
 #Options download
 ind = pd.read_csv('data/free_indicators_glassnode.csv')
 dic = ind[['category','metric']]
 addresses = dic.metric[dic.category == 'addresses'].values
-mining = dic.metric[dic.category == 'mining'].values
+#mining = dic.metric[dic.category == 'mining'].values
 transactions = dic.metric[dic.category == 'transactions'].values
 fees = dic.metric[dic.category == 'fees'].values
 indicators = dic.metric[dic.category == 'indicators'].values
@@ -36,14 +35,13 @@ blockchain = dic.metric[dic.category == 'blockchain'].values
 supply = dic.metric[dic.category == 'supply'].values
 market = dic.metric[dic.category == 'market'].values
 institutions = dic.metric[dic.category == 'institutions'].values
-signals = dic.metric[dic.category == 'signals'].values
+#signals = dic.metric[dic.category == 'signals'].values
 categories = list(ind.category)
 
 ## Sidebar options
 
 # titre sidebar
 st.sidebar.header('Dashboard')
-
 
 #st.sidebar.subheader('Données')
 categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'On-Chain'))
@@ -103,12 +101,13 @@ else:
         )
 
         checkbox_val = st.checkbox("Logarithmic")
+        checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
+        ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
+
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("**Envoyer**")
 
-
-            
 
 st.sidebar.markdown('''
 ---
@@ -142,6 +141,8 @@ if categorie == 'Technique':
             df = df_btc.copy()
             df.reset_index(drop=False, inplace=True)
             df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
+            df.Date = pd.to_datetime(df.Date)
+
 
             one_year = 300
 
@@ -309,26 +310,46 @@ if categorie == 'Technique':
             use_container_width=True)     
      
 
-
 elif categorie == 'Macro':
-    if indicateur == 'Masse Monétaire': 
-        st.header('Bitcoin vs `M2`')
+    st.write('to do')
+    #if indicateur == 'Masse Monétaire': 
+    #    st.header('Bitcoin vs `M2`')
         # importing Merged DF (BTC and M2s) 
 
-        df = merged_btc_M2s()
-        merged = pd.DataFrame(df)
+     #   df = merged_btc_M2s()
+     #   merged = pd.DataFrame(df)
 
-        df = df_btc.copy()
-        df = df[-days_to_plot:]
+    #   df = df_btc.copy()
+     #   df = df[-days_to_plot:]
 
-        st.plotly_chart(z_score(merged, 'M2_Fed_and_ECB') ,use_container_width=True)
-
+     #   st.plotly_chart(z_score(merged, 'M2_Fed_and_ECB') ,use_container_width=True)
 
 
 elif categorie == 'On-Chain':
-    df = on_chain_merge(onchain, metrics)
-    st.header(f'You are looking at `{metrics}` from the category **{onchain}**')
-    st.table(df.tail())
-
-
     
+    df = on_chain_merge(onchain, metrics)
+    st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
+    df = df[-days_to_plot:]
+    Zscore = True
+    if Zscore == True:
+        st.plotly_chart(on_chain_viz_zscore_test(df, True, True, ma, onchain, metrics, True ),
+                    use_container_width=True)   
+
+    else:
+        if checkbox_val == True :
+            if checkbox_val_metric == True:
+                st.plotly_chart(on_chain_viz(df, True, True, ma, onchain, metrics ),
+                    use_container_width=True)   
+            
+            elif checkbox_val_metric == False:
+                st.plotly_chart(on_chain_viz(df, True, False,ma, onchain, metrics ),
+                    use_container_width=True)   
+            
+        elif checkbox_val == False:
+            if checkbox_val_metric == True:
+                st.plotly_chart(on_chain_viz(df, False, True, ma,onchain, metrics ),
+                use_container_width=True)   
+            else : 
+                st.plotly_chart(on_chain_viz(df, False, False, ma, onchain, metrics),
+                    use_container_width=True)            
+            
