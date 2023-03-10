@@ -45,7 +45,7 @@ def on_chain_viz(df: pd.DataFrame, log_scale: bool, log_scale_metric: bool, ma :
 
 
 
-def on_chain_viz_zscore_test(df: pd.DataFrame, log_scale: bool, log_scale_metric: bool, ma : int, categorie: str = 'onchain', indic: str = 'metric', z_score: bool = True):
+def on_chain_viz_zscore(df: pd.DataFrame, log_scale: bool, log_scale_metric: bool, ma : int, categorie: str = 'onchain', indic: str = 'metric', z_score: bool = True):
 
     fig = make_subplots(rows=2, cols=1, specs=[[{"secondary_y": True}],[{"secondary_y": True}]], shared_xaxes=True, vertical_spacing=0.1, row_width=[0.1, 0.3])
     
@@ -58,24 +58,34 @@ def on_chain_viz_zscore_test(df: pd.DataFrame, log_scale: bool, log_scale_metric
     z_scores = (df['metric'] -  df['metric'].rolling(ma).mean()) /  df['metric'].rolling(ma).std()
 
     if z_score == True: 
-        fig.add_trace(go.Bar(x=df.index, y=z_scores.rolling(ma+7).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
-    else: fig.add_trace(go.Line(x=df.index, y=df['metric'].rolling(ma).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
-
-    title = categorie.capitalize() + ' ' + indic.capitalize()
-
-    fig.update_layout(title=title)
-
-    if log_scale == True:
-        if log_scale_metric == True :
+        if log_scale:
             fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='log'), yaxis2=dict(title='metric', overlaying='y', side='right'))
-        elif log_scale_metric == False : 
-            fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='log'), yaxis2=dict(title='metric', type='linear', overlaying='y', side='right'))
-    elif log_scale == False : 
-        if log_scale_metric == True :
-            fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='linear'), yaxis2=dict(title='metric', type='log', overlaying='y', side='right'))
-        else:
-            fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='linear'), yaxis2=dict(title='metric', type='linear', overlaying='y', side='right'))
+            fig.add_trace(go.Bar(x=df.index, y=z_scores.rolling(ma+7).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
+        if log_scale == False:
+            fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='linear'), yaxis2=dict(title='metric', overlaying='y', side='right'))
+            fig.add_trace(go.Bar(x=df.index, y=z_scores.rolling(ma+7).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
+
+    else:
+        if log_scale == True:
+            if log_scale_metric == True :
+                fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='log'), yaxis2=dict(title='metric', overlaying='y', side='right'))
+                fig.add_trace(go.Line(x=df.index, y=df['metric'].rolling(ma).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
+                fig.update_layout(yaxis2=dict(title='metric', type='log', overlaying='y', side='right'))
+
+            elif log_scale_metric == False : 
+                fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='log'), yaxis2=dict(title='metric', type='linear', overlaying='y', side='right'))
+                fig.add_trace(go.Line(x=df.index, y=df['metric'].rolling(ma).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
+        elif log_scale == False : 
+            if log_scale_metric == True :
+                fig.add_trace(go.Line(x=df.index, y=df['metric'].rolling(ma).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
+                fig.update_layout(yaxis2=dict(title='metric', type='log', overlaying='y', side='right'))
+            else:
+                fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='linear'), yaxis2=dict(title='metric', type='linear', overlaying='y', side='right'))
+                fig.add_trace(go.Line(x=df.index, y=df['metric'].rolling(ma).mean(), name= categorie + '_' + indic, yaxis='y2'), row=1, col=1, secondary_y=True)
+        
     
+    title = categorie.capitalize() + ' ' + indic.capitalize()
+    fig.update_layout(title=title)
     fig.update_layout(width=600, height=800)
     fig['layout']['xaxis2']['title'] = 'Date'
     fig['layout']['yaxis']['title'] = 'Price'
