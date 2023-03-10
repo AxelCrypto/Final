@@ -9,6 +9,9 @@ from functions.patterns import *
 from functions.on_chain import *
 from functions.on_chain_viz import *
 from functions.Macro import *
+import yfinance as yf
+from datetime import datetime
+
 
 df_btc = btc()
 
@@ -323,17 +326,38 @@ if categorie == 'Technique':
      
 
 elif categorie == 'Macro':
-    df_usd = pd.DataFrame(M2_usd())
-    df_eur = pd.DataFrame(M2_ecb())
-    df_btc.index = pd.to_datetime(df_btc.index)
-    df = merging(df_usd,df_eur, df_btc)
-    df ['M2_sum'] = df.m2_usd + df.m2_eur
-    st.plotly_chart(macro_zscore(df, checkbox_val, checkbox_val_metric, ma, 
-                                 #checkbox_macro_zscore, 
-                                 indicateur ),
+    if indicateur == 'Masse Monétaire': 
+
+        st.header('Bitcoin vs `money printing`')
+        df_usd = pd.DataFrame(M2_usd())
+        df_eur = pd.DataFrame(M2_ecb())
+        df_btc.index = pd.to_datetime(df_btc.index)
+        df = merging(df_usd,df_eur, df_btc)
+        df ['M2_sum'] = df.m2_usd + df.m2_eur
+        st.plotly_chart(macro_zscore(df, checkbox_val, checkbox_val_metric, ma, 
+                                    #checkbox_macro_zscore, 
+                                    indicateur ),
+                        use_container_width=True)   
+
+    elif indicateur == 'DXY': 
+
+        st.header('Bitcoin vs `USD Value Index`')  
+
+        try:
+            dxy = pd.read_csv('data/datos/dxy.csv', index_col= 'Date')
+
+        except: 
+            dxy = yf.download('DX-Y.NYB', start='2010-01-01', end=datetime.today())
+            dxy = pd.DataFrame(dxy)
+            #dxy.set_index('Date')
+            #dxy.index = pd.to_datetime(df.index)
+            dxy.to_csv('data/datos/dxy.csv')
+
+
+        st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
                     use_container_width=True)   
 
-    
+
 
 
 elif categorie == 'On-Chain':
