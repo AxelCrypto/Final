@@ -8,6 +8,7 @@ from get_merge_btc_M2s import *
 from functions.patterns import *
 from functions.on_chain import *
 from functions.on_chain_viz import *
+from functions.Macro import *
 
 df_btc = btc()
 
@@ -27,7 +28,6 @@ st.set_page_config(
 ind = pd.read_csv('data/free_indicators_glassnode.csv')
 dic = ind[['category','metric']]
 addresses = dic.metric[dic.category == 'addresses'].values
-#mining = dic.metric[dic.category == 'mining'].values
 transactions = dic.metric[dic.category == 'transactions'].values
 fees = dic.metric[dic.category == 'fees'].values
 indicators = dic.metric[dic.category == 'indicators'].values
@@ -35,7 +35,6 @@ blockchain = dic.metric[dic.category == 'blockchain'].values
 supply = dic.metric[dic.category == 'supply'].values
 market = dic.metric[dic.category == 'market'].values
 institutions = dic.metric[dic.category == 'institutions'].values
-#signals = dic.metric[dic.category == 'signals'].values
 categories = list(ind.category)
 
 ## Sidebar options
@@ -46,16 +45,10 @@ st.sidebar.header('Dashboard')
 #st.sidebar.subheader('Données')
 categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'On-Chain'))
 
-if categorie == 'Technique' or categorie == 'Macro':
+if categorie == 'Technique':
 
     with st.sidebar.form("Indicateurs"):
-        #st.write("Selectionnez")
-        if categorie == 'Technique':
-            indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA'))
-        elif categorie == 'Macro':
-            indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
-
-
+        indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA'))
 
         days_to_plot = st.slider(
             'Nombre de jours',
@@ -68,9 +61,28 @@ if categorie == 'Technique' or categorie == 'Macro':
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("**Envoyer**")
+ 
+elif categorie == 'Macro':
+    with st.sidebar.form("Macro"):
+        indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
+        days_to_plot = st.slider(
+            'Nombre de jours',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+            )
+
+        checkbox_val = st.checkbox("Logarithmic")
+        checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
+        ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
+
+        checkbox_macro_zscore = st.checkbox("Activer le Z-Score")
+
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("**Envoyer**")
 
 else:
-    onchain = st.sidebar.selectbox('onchain', (sorted(set(categories))))
+    onchain = st.sidebar.selectbox('**Type**', (sorted(set(categories))))
     with st.sidebar.form("On-Chain"):
         if onchain == 'addresses':
             metrics = st.selectbox("**metrics**", addresses)
@@ -108,7 +120,6 @@ else:
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("**Envoyer**")
-
 
 st.sidebar.markdown('''
 ---
@@ -313,17 +324,16 @@ if categorie == 'Technique':
 
 elif categorie == 'Macro':
     st.write('to do')
-    #if indicateur == 'Masse Monétaire': 
-    #    st.header('Bitcoin vs `M2`')
-        # importing Merged DF (BTC and M2s) 
+    df_usd = pd.DataFrame(M2_usd())
+    df_eur = pd.DataFrame(M2_ecb())
+    df_btc.index = pd.to_datetime(df_btc.index)
+    df = merging(df_usd,df_eur, df_btc)
+    df ['M2_sum'] = df.m2_usd + df.m2_eur
+    st.table(df.tail())
+    st.plotly_chart(macro_zscore(df, checkbox_val, checkbox_val_metric, checkbox_macro_zscore, ma, indicateur ),
+                    use_container_width=True)   
 
-     #   df = merged_btc_M2s()
-     #   merged = pd.DataFrame(df)
-
-    #   df = df_btc.copy()
-     #   df = df[-days_to_plot:]
-
-     #   st.plotly_chart(z_score(merged, 'M2_Fed_and_ECB') ,use_container_width=True)
+    
 
 
 elif categorie == 'On-Chain':

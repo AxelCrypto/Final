@@ -2,9 +2,10 @@ from full_fred.fred import Fred
 import pandas as pd
 import numpy as np
 from datetime import datetime
-
+import os
 
 def M2_usd():
+    Path = os.path.dirname( os.path.abspath(__file__))
     with open('functions/data/API Fred.txt') as api:
         api = api.readlines()[0]
         
@@ -42,7 +43,6 @@ def M2_usd():
 
     return M2
 
-
 # only CSV, missing a scraping BS for latest data
 def M2_ecb():
     ecb = pd.read_csv('functions/data/ECB_data.csv')
@@ -72,8 +72,20 @@ def M2_ecb():
     return ecb
 
 def merging(df1,df2, btc):
-    combined = df1.merge(df2, left_index = True, right_index = True) 
-    combined.iloc[:,1] = combined.iloc[:,1]/1000
-    combined.columns = ['m2_usd','m2_eur']
-    combined = combined.merge(btc, left_index= True, right_index = True)
-    return combined
+    Path = os.path.dirname( os.path.abspath(__file__))
+
+    try:
+        df = pd.read_csv(Path+'/../data/datos/merged_M2s.csv', index_col= 'timestamp')
+       # df.set_index('timestamp', drop = True, inplace=True)
+       # df.index = pd.to_datetime(df.index)
+        return df
+
+    except:
+
+        combined = df1.merge(df2, left_index = True, right_index = True) 
+        combined.iloc[:,1] = combined.iloc[:,1]/1000
+        combined.columns = ['m2_usd','m2_eur']
+        combined = combined.merge(btc, left_index= True, right_index = True)
+        combined.to_csv(Path+'/../data/datos/merged_M2s.csv')
+
+        return combined
