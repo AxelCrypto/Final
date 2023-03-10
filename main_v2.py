@@ -76,7 +76,7 @@ elif categorie == 'Macro':
         checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
         ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
 
-        checkbox_macro_zscore = st.checkbox("Activer le Z-Score")
+        #checkbox_macro_zscore = st.checkbox("Activer le Z-Score")
 
         # Every form must have a submit button.
         submitted = st.form_submit_button("**Envoyer**")
@@ -323,14 +323,14 @@ if categorie == 'Technique':
      
 
 elif categorie == 'Macro':
-    st.write('to do')
     df_usd = pd.DataFrame(M2_usd())
     df_eur = pd.DataFrame(M2_ecb())
     df_btc.index = pd.to_datetime(df_btc.index)
     df = merging(df_usd,df_eur, df_btc)
     df ['M2_sum'] = df.m2_usd + df.m2_eur
-    st.table(df.tail())
-    st.plotly_chart(macro_zscore(df, checkbox_val, checkbox_val_metric, checkbox_macro_zscore, ma, indicateur ),
+    st.plotly_chart(macro_zscore(df, checkbox_val, checkbox_val_metric, ma, 
+                                 #checkbox_macro_zscore, 
+                                 indicateur ),
                     use_container_width=True)   
 
     
