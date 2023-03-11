@@ -131,11 +131,17 @@ NFA, by [Axel](https://www.youtube.com/c/AxelGirouGarcia).
 ''')
 
 
+
 # Charts selon la selection:
 
 if categorie == 'Technique':
     if indicateur == 'Prix': 
         st.header('Bitcoin `Prix actuel`')
+#        st.markdown('### Metrics')
+#        col1, col2, col3 = st.columns(3)
+        st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
+#        col2.metric("Wind", "9 mph", "-8%")
+#        col3.metric("Humidity", "86%", "4%")
 
         df = df_btc.copy()
         df = df[-days_to_plot:]
@@ -288,6 +294,7 @@ if categorie == 'Technique':
 
             st.plotly_chart(fig ,use_container_width=False)
 
+
     elif indicateur == 'Bull-Market Support Bands': 
         st.header('Bitcoin `Bull-Market Support Bands`')
 
@@ -297,11 +304,31 @@ if categorie == 'Technique':
         df['21w_ema'] = df['Close'].ewm(span=21, adjust=False).mean()
         df = df[-days_to_plot:]
 
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
+        col2.metric("Last  price 21w EMA", round(df['21w_ema'][-1],0), round((df['21w_ema'][-1]/df['21w_ema'][-2] - 1)*100,2))
+        col3.metric("Last  price 20w SMA", round(df['20w_sma'][-1],0), round((df['20w_sma'][-1]/df['20w_sma'][-2] - 1)*100,2))
+        st.caption('Bull-Market Support bands are a good support during :green[bullmarkets] and a strong resistence during :red[bearmarkets]')
+
+
+        if st.button('**Evaluate the current situation**'):
+
+            if df_btc.iloc[-1,0] > min(df['21w_ema'][-1],df['20w_sma'][-1],0):
+                st.subheader('Currently we are in a :green[bullmarket] :rocket:')
+
+            else :
+                st.subheader('Currently we are in a :red[bearmarket] :bear:')
+
+
+
         # Determine the y-axis type
+        
         if checkbox_val == True:
             st.plotly_chart(
             get_candlestick_plot_ma(df, True, 'btc' ),
             use_container_width=True)   
+            
             
 
         else : 
@@ -314,16 +341,54 @@ if categorie == 'Technique':
         df = df_btc.copy()
         df = df[-days_to_plot:]
 
-        # Determine the y-axis type
-        if checkbox_val == True:
-            st.plotly_chart(
-            get_candlestick_plot_EHMA(df, True, 'btc' ),
-            use_container_width=True)   
-            
-        else : 
-           st.plotly_chart(get_candlestick_plot_EHMA(df, False, 'btc'),
-            use_container_width=True)     
-     
+        # Add EHMA indicator
+        period = 180
+        yukdus = True
+        sqrt_period = np.sqrt(period)
+
+        def borserman_ema(x, y):
+            alpha = 2 / (y + 1)
+            sum = np.array([alpha * x[0]])
+            for i in range(1, len(x)):
+                value = alpha * x[i] + (1 - alpha) * sum[i-1]
+                sum = np.append(sum, value)
+            return sum
+
+        close_ema1 = borserman_ema(df['Close'], int(period / 2))
+        close_ema2 = borserman_ema(df['Close'], period)
+        ehma = borserman_ema(2 * close_ema1 - close_ema2, sqrt_period)
+        
+        #col1, col2, col3 = st.columns(3)
+        #st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
+        #col2.metric("Last  price 21w EMA", round(df['21w_ema'][-1],0), round((df['21w_ema'][-1]/df['21w_ema'][-2] - 1)*100,2))
+        #col3.metric("Last  price 20w SMA", round(df['20w_sma'][-1],0), round((df['20w_sma'][-1]/df['20w_sma'][-2] - 1)*100,2))
+        st.caption('**Traditional moving averages lag the price activity. But with some clever mathematics the lag can be minimised. If green we are in a :green[bullmarkets], if red we are in a :red[bearmarkets]**')
+
+
+        if st.button('**Evaluate the current situation**'):
+
+            if ehma[-1] > ehma[-2]:
+                st.subheader('Currently we are in a :green[bullmarket] :rocket:')
+
+            else :
+                st.subheader('Currently we are in a :red[bearmarket] :bear:')
+
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+            st.header("Chart")
+            # Determine the y-axis type
+            if checkbox_val == True:
+                st.plotly_chart(
+                get_candlestick_plot_EHMA(df, True, 'btc' ),
+                use_container_width=True)   
+                
+            else : 
+                st.plotly_chart(get_candlestick_plot_EHMA(df, False, 'btc'),
+                    use_container_width=True)     
+        
+        with tab2:
+             st.header('Machine Learning is Coming')
 
 elif categorie == 'Macro':
     if indicateur == 'Masse Monétaire': 

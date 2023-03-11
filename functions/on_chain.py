@@ -35,22 +35,46 @@ import os
 Path = os.path.dirname( os.path.abspath(__file__))
 
 def on_chain_merge(categorie, metric):
-    try:
-        df_merged = pd.read_csv(Path+'/../data/datos/merged_{categorie}_{metric}.csv', index_col= 'timestamp')
-        return df_merged
-    except:
-        df = on_chain_df(categorie, metric).copy()
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        df.set_index('timestamp', drop = True, inplace = True)
-        df_btc = btc().copy()
-        df_btc.index = pd.to_datetime(df_btc.index)
-        df_merged = df_btc.merge(df, left_index=True, right_index=True)
+    
+    if metric == 'stock_to_flow_ratio':
         try:
-            df_merged['timestamp'] = pd.to_datetime(df_merged['timestamp'])
-            df_merged.set_index('timestamp',drop=True, inplace = True)
-        except:pass
-        df_merged.to_csv(Path+f'/../data/datos/merged_{categorie}_{metric}.csv')
+            df_merged = pd.read_csv(Path+'/../data/datos/merged_{categorie}_{metric}.csv', index_col= 'timestamp')
+            return df_merged
+        except:
+            df_merged = glassnode('/v1/metrics/indicators/stock_to_flow_ratio')
+            df_merged = df_merged.merge(pd.json_normalize(df_merged.stock_to_flow_ratio), left_index= True, right_index=True)
+            del df_merged['stock_to_flow_ratio']
+            del df_merged['price']
+            df_merged.set_index('timestamp', drop=True, inplace = True)
+            df_merged.columns = ['days','metric']
+            df_btc = btc().copy()
+            df_btc.index = pd.to_datetime(df_btc.index)
+            df_merged = df_btc.merge(df_merged, left_index=True, right_index=True)
+            try:
+                df_merged['timestamp'] = pd.to_datetime(df_merged['timestamp'])
+                df_merged.set_index('timestamp',drop=True, inplace = True)
+            except:pass
+            df_merged.to_csv(Path+f'/../data/datos/merged_{categorie}_{metric}.csv')
+            return df_merged
 
-        return df_merged
+    else:
+        try:
+            df_merged = pd.read_csv(Path+'/../data/datos/merged_{categorie}_{metric}.csv', index_col= 'timestamp')
+            return df_merged
+
+        except:
+            df = on_chain_df(categorie, metric).copy()
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df.set_index('timestamp', drop = True, inplace = True)
+            df_btc = btc().copy()
+            df_btc.index = pd.to_datetime(df_btc.index)
+            df_merged = df_btc.merge(df, left_index=True, right_index=True)
+            try:
+                df_merged['timestamp'] = pd.to_datetime(df_merged['timestamp'])
+                df_merged.set_index('timestamp',drop=True, inplace = True)
+            except:pass
+            df_merged.to_csv(Path+f'/../data/datos/merged_{categorie}_{metric}.csv')
+
+            return df_merged
 
 
