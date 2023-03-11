@@ -11,6 +11,8 @@ from functions.on_chain_viz import *
 from functions.Macro import *
 import yfinance as yf
 from datetime import datetime
+import requests
+
 
 
 df_btc = btc()
@@ -40,13 +42,14 @@ market = dic.metric[dic.category == 'market'].values
 institutions = dic.metric[dic.category == 'institutions'].values
 categories = list(ind.category)
 
+
 ## Sidebar options
 
 # titre sidebar
 st.sidebar.header('Dashboard')
 
 #st.sidebar.subheader('Données')
-categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'On-Chain'))
+categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Mining', 'On-Chain'))
 
 if categorie == 'Technique':
 
@@ -84,11 +87,29 @@ elif categorie == 'Macro':
         # Every form must have a submit button.
         submitted = st.form_submit_button("**Envoyer**")
 
+elif categorie == 'Mining':
+    with st.sidebar.form("Mining"):
+        indicateur = st.selectbox('Mining Indicators', ('Hashrate', 'Total Transaction Fees (BTC)'))
+        days_to_plot = st.slider(
+            'Nombre de jours',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+            )
+
+        checkbox_val = st.checkbox("Logarithmic")
+        checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
+        ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
+
+        checkbox_macro_zscore = st.checkbox("Activer le Z-Score")
+
+        submitted = st.form_submit_button("**Envoyer**")
+
 else:
     onchain = st.sidebar.selectbox('**Type**', (sorted(set(categories))))
     with st.sidebar.form("On-Chain"):
         if onchain == 'addresses':
-            metrics = st.selectbox("**metrics**", addresses)
+            metrics = st.selectbox("**metrics**", ('active_count','new_non_zero_count','unique-addresses'))
         elif onchain == 'blockchain':
             metrics = st.selectbox("**metrics**", blockchain)
         elif onchain == 'mining':
@@ -422,14 +443,116 @@ elif categorie == 'Macro':
         st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
                     use_container_width=True)   
 
+elif categorie == 'Mining':
+    if indicateur == 'Hashrate': 
 
+        try : 
+            df = pd.read_csv(f'data/datos/{categorie}_{indicateur}.csv', index_col='timestamp')
+
+        except:
+            # Define the API endpoint and parameters
+            url = "https://api.blockchain.info/charts/hash-rate"
+            params = {"timespan": "all", "format": "json"}
+            response = requests.get(url, params=params)
+
+            # Convert the JSON response to a DataFrame
+            data = pd.DataFrame(response.json()["values"])
+
+            # Convert the timestamp values to datetime objects
+            data["x"] = pd.to_datetime(data["x"], unit="s")
+
+            # Rename the columns to something more meaningful
+            data = data.rename(columns={"x": "timestamp", "y": "metric"})
+            data.set_index('timestamp', drop= True, inplace = True)
+
+            df_btc.index = pd.to_datetime(df_btc.index)
+            df = df_btc.merge(data, left_index= True, right_index= True)
+            df.to_csv(f'data/datos/{categorie}_{indicateur}.csv')
+        
+        st.header(f'You are looking at `{indicateur}` from the category `{categorie}`')
+        df = df[-days_to_plot:]
+        
+
+        st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, indicateur,checkbox_macro_zscore ),
+                        use_container_width=True)   
+
+    elif indicateur == 'Total Transaction Fees (BTC)': 
+
+        try : 
+            df = pd.read_csv(f'data/datos/{categorie}_{indicateur}.csv', index_col='timestamp')
+
+        except:
+            # Define the API endpoint and parameters
+            url = "https://api.blockchain.info/charts/transaction-fees"
+            params = {"timespan": "all", "format": "json"}
+            response = requests.get(url, params=params)
+
+            # Convert the JSON response to a DataFrame
+            data = pd.DataFrame(response.json()["values"])
+
+            # Convert the timestamp values to datetime objects
+            data["x"] = pd.to_datetime(data["x"], unit="s")
+
+            # Rename the columns to something more meaningful
+            data = data.rename(columns={"x": "timestamp", "y": "metric"})
+            data.set_index('timestamp', drop= True, inplace = True)
+
+            df_btc.index = pd.to_datetime(df_btc.index)
+            df = df_btc.merge(data, left_index= True, right_index= True)
+            df.to_csv(f'data/datos/{categorie}_{indicateur}.csv')
+        
+        st.header(f'You are looking at `{indicateur}` from the category `{categorie}`')
+        df = df[-days_to_plot:]
+        
+
+        st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, indicateur,checkbox_macro_zscore ),
+                        use_container_width=True)   
 
 
 elif categorie == 'On-Chain':
     
-    df = on_chain_merge(onchain, metrics)
-    st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
-    df = df[-days_to_plot:]
 
-    st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, onchain, metrics,checkbox_zscore ),
-                    use_container_width=True)   
+    if metrics == 'unique-addresses':
+
+        try : 
+            df = pd.read_csv(f'data/datos/{categorie}_{metrics}.csv', index_col='timestamp')
+
+        except:
+            # Define the API endpoint and parameters
+            url = "https://api.blockchain.info/charts/n-unique-addresses"
+            params = {"timespan": "all", "format": "json"}
+            response = requests.get(url, params=params)
+
+            # Convert the JSON response to a DataFrame
+            data = pd.DataFrame(response.json()["values"])
+
+            # Convert the timestamp values to datetime objects
+            data["x"] = pd.to_datetime(data["x"], unit="s")
+
+            # Rename the columns to something more meaningful
+            data = data.rename(columns={"x": "timestamp", "y": "metric"})
+            data.set_index('timestamp', drop= True, inplace = True)
+
+            df_btc.index = pd.to_datetime(df_btc.index)
+            df = df_btc.merge(data, left_index= True, right_index= True)
+            df.to_csv(f'data/datos/{categorie}_{metrics}.csv')
+        
+        st.header(f'You are looking at `{metrics}` from the category `{categorie}`')
+
+        st.caption('Total number of unique addresses used on the blockchain. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
+
+        df = df[-days_to_plot:]
+        
+        st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, metrics,checkbox_zscore ),
+                        use_container_width=True)   
+
+
+
+
+    else:
+        df = on_chain_merge(onchain, metrics)
+        st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
+        df = df[-days_to_plot:]
+
+        st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, onchain, metrics,checkbox_zscore ),
+                        use_container_width=True)   
