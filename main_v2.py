@@ -424,6 +424,14 @@ elif categorie == 'Macro':
         df = merging(df_usd,df_eur, df_btc)
         df ['M2_sum'] = df.m2_usd + df.m2_eur
 
+        days = st.number_input(
+            'Number of days to compare',
+            min_value=31,
+            max_value=3650,
+            value=31,
+            step=1
+        )
+
         if st.button('**Evaluate the current situation**'):
 
             if df ['M2_sum'][-1] > df ['M2_sum'][-31]:
@@ -453,7 +461,7 @@ elif categorie == 'Macro':
             #dxy.index = pd.to_datetime(df.index)
             dxy.to_csv('data/datos/dxy.csv')
 
-        st.caption('The dollar index tracks the relative value of the U.S. dollar against a basket of important world currencies.\n\n'
+        st.caption('The dollar index tracks the relative value of the U.S. dollar against a basket of important world currencies.\n'
                 'If the index is :red[rising], it means that the dollar is strengthening against the basket - and vice-versa.\n\n'
                 'USD tends to appreciate in a deleveraging and derisking period. :bear:\n\n'
                 'USD tends to depreciate in a risk-taking period with low interest rates and quantitative easing. :money_with_wings:')
@@ -511,8 +519,42 @@ elif categorie == 'Mining':
         df = df[-days_to_plot:]
         
 
+        st.caption('The hashrate is the computing power miners use to secure the Bitcoin network. \n\n'
+                    "When the hashrate :red[drops], it means that miners are closing, maybe selling assets (like bitocin) and the bitcoin's netowrk is less secure. :bear: \n\n"
+                    'When the hashrate :green[rises], it :  \n\n'
+                    '- increased difficulty which makes it more costly to mine Bitcoin.  \n\n'
+                    '- may indicate an increased demand for Bitcoin  \n\n'
+                    "- makes the Bitcoin's network more secure :mechanical_arm:" 
+        )
+
+        days = st.number_input(
+            'Number of days to compare',
+            min_value=1,
+            max_value=3650,
+            value=30,
+            step=1
+        )
+
+        if st.button('**Evaluate the current situation**'):
+
+            
+
+
+            if df ['metric'][-1] > df ['metric'][-days-1:].mean():
+                st.subheader(f"Hashrate is currently :green[higher] than the **{days}** last days' average. :rocket:")
+
+            else :
+                st.subheader(f"Hashrate is currently :red[lower] than the **{days}** last days' average. :bear:")
+
+
         st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, indicateur,checkbox_zscore ),
-                        use_container_width=True)   
+                            use_container_width=True)   
+
+
+        url = 'https://www.youtube.com/watch?v=sWrNNh47p3Y'
+        st.header('Vidéo explicative de la relation entre Prix du Bitcoin et Hashrate (FR)')
+        st.video(url)
+
 
     elif indicateur == 'Total Transaction Fees (BTC)': 
 
