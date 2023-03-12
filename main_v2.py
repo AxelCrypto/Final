@@ -9,10 +9,11 @@ from functions.patterns import *
 from functions.on_chain import *
 from functions.on_chain_viz import *
 from functions.Macro import *
+from functions.balances import *
 import yfinance as yf
 from datetime import datetime
 import requests
-
+import cryptocompare as cc
 
 
 df_btc = btc()
@@ -32,13 +33,8 @@ st.set_page_config(
 #Options download
 ind = pd.read_csv('data/free_indicators_glassnode.csv')
 dic = ind[['category','metric']]
-addresses = dic.metric[dic.category == 'addresses'].values
-transactions = dic.metric[dic.category == 'transactions'].values
-indicators = dic.metric[dic.category == 'indicators'].values
-supply = dic.metric[dic.category == 'supply'].values
-market = dic.metric[dic.category == 'market'].values
-institutions = dic.metric[dic.category == 'institutions'].values
 categories = list(ind.category)
+categories.append('balances')
 
 
 ## Sidebar options
@@ -52,7 +48,7 @@ categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Minin
 if categorie == 'Technique':
 
     with st.sidebar.form("Indicateurs"):
-        indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA'))
+        indicateur = st.selectbox('Indicateurs techniques ', ('Prix', 'Bull-Market Support Bands', 'EHMA', 'Mayer Multiple', 'Puell Multiple'))
 
         days_to_plot = st.slider(
             'Nombre de jours',
@@ -108,6 +104,9 @@ else:
     with st.sidebar.form("On-Chain"):
         if onchain == 'addresses':
             metrics = st.selectbox("**metrics**", ('active_count','new_non_zero_count','unique-addresses'))
+        elif onchain == 'balances':
+            type_balance = st.selectbox("**Type of Balances**", ('Adresses Count','Balances'))
+            metrics = st.selectbox("**metrics**", ('<0.01','0.01 - 0.1','0.1 - 1', '1 - 10', '10 - 100','100 - 1000', '1k - 10k','10k+'))
         elif onchain == 'transactions':
             metrics = st.selectbox("**metrics**", ('count','size_mean','count'))
         elif onchain == 'indicators':
@@ -150,7 +149,7 @@ if categorie == 'Technique':
         st.header('Bitcoin `Prix actuel`')
 #        st.markdown('### Metrics')
 #        col1, col2, col3 = st.columns(3)
-        st.caption('Current pricing canals :chart_with_upwards_trend: :chart_with_downwards_trend:')
+        st.write('Current pricing canals :chart_with_upwards_trend: :chart_with_downwards_trend:')
 
         
 #        col2.metric("Wind", "9 mph", "-8%")
@@ -302,17 +301,15 @@ if categorie == 'Technique':
         df = df[-days_to_plot:]
         
 
-        # Determine the y-axis type
-        if checkbox_val == True:
-            st.plotly_chart(
-            get_candlestick_plot(df, True, 'btc' ),
-            use_container_width=True)   
-            
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
 
-        else : 
-           st.plotly_chart(get_candlestick_plot(df, False, 'btc'),
-            use_container_width=True)    
+        with tab1:
+
+            st.plotly_chart(get_candlestick_plot(df, checkbox_val, 'btc'),
+                use_container_width=True)    
            
+        with tab2:
+            st.header('ML is comming')
 
 
     elif indicateur == 'Bull-Market Support Bands': 
@@ -329,31 +326,30 @@ if categorie == 'Technique':
         col1.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
         col2.metric("Last  price 21w EMA", round(df['21w_ema'][-1],0), round((df['21w_ema'][-1]/df['21w_ema'][-2] - 1)*100,2))
         col3.metric("Last  price 20w SMA", round(df['20w_sma'][-1],0), round((df['20w_sma'][-1]/df['20w_sma'][-2] - 1)*100,2))
-        st.caption('Bull-Market Support bands are a good support during :green[bullmarkets] and a strong resistence during :red[bearmarkets]')
+        st.write('Bull-Market Support bands are a good support during :green[bullmarkets] and a strong resistence during :red[bearmarkets]')
 
 
         if st.button('**Evaluate the current situation**'):
 
             if df_btc.iloc[-1,0] > min(df['21w_ema'][-1],df['20w_sma'][-1],0):
-                st.subheader('Currently we are in a :green[bullmarket] :rocket:')
+                st.subheader('We are currently in a :green[bullmarket] :rocket:')
 
             else :
-                st.subheader('Currently we are in a :red[bearmarket] :bear:')
+                st.subheader('We are currently in a :red[bearmarket] :bear:')
 
 
 
         # Determine the y-axis type
         
-        if checkbox_val == True:
-            st.plotly_chart(
-            get_candlestick_plot_ma(df, True, 'btc' ),
-            use_container_width=True)   
-            
-            
 
-        else : 
-           st.plotly_chart(get_candlestick_plot_ma(df, False, 'btc'),
-            use_container_width=True)            
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+            st.plotly_chart(get_candlestick_plot_ma(df, checkbox_val, 'btc' ),
+                use_container_width=True)   
+            
+        with tab2:
+            st.header("ML is comming")   
 
     elif indicateur == 'EHMA': 
         st.header('Bitcoin `EHMA`')
@@ -382,21 +378,20 @@ if categorie == 'Technique':
         #st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
         #col2.metric("Last  price 21w EMA", round(df['21w_ema'][-1],0), round((df['21w_ema'][-1]/df['21w_ema'][-2] - 1)*100,2))
         #col3.metric("Last  price 20w SMA", round(df['20w_sma'][-1],0), round((df['20w_sma'][-1]/df['20w_sma'][-2] - 1)*100,2))
-        st.caption('**Traditional moving averages lag the price activity. But with some clever mathematics the lag can be minimised. If green we are in a :green[bullmarkets], if red we are in a :red[bearmarkets]**')
+        st.write('**Traditional moving averages lag the price activity. But with some clever mathematics the lag can be minimised. If green we are in a :green[bullmarkets], if red we are in a :red[bearmarkets]**')
 
 
         if st.button('**Evaluate the current situation**'):
 
             if ehma[-1] > ehma[-2]:
-                st.subheader('Currently we are in a :green[bullmarket] :rocket:')
+                st.subheader('We are currently in a :green[bullmarket] :rocket:')
 
             else :
-                st.subheader('Currently we are in a :red[bearmarket] :bear:')
+                st.subheader('We are currently in a :red[bearmarket] :bear:')
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
-            st.header("Chart")
             # Determine the y-axis type
             if checkbox_val == True:
                 st.plotly_chart(
@@ -410,12 +405,83 @@ if categorie == 'Technique':
         with tab2:
              st.header('Machine Learning is Coming')
 
+    elif indicateur == 'Mayer Multiple':
+        st.header('Bitcoin `Mayer Multiple`')
+        df = df_btc.copy()
+        df['200d_ma'] = df['Close'].rolling(200).mean()
+        df['metric'] = df['Close'] / df['200d_ma']
+        df = df[-days_to_plot:]
+
+
+        col1, col2 = st.columns(2)
+        col1.metric("Last  price Bitcoin", round(df['Close'][-1],0), round((df['Close'][-1]/df['Close'][-2] - 1)*100,2))
+        col2.metric("Last  Mayer Multiple", round(df['metric'][-1],2), round((df['metric'][-1]/df['metric'][-2] - 1)*100,2))
+        st.write('The Mayer Multiple is calculated by dividing the Bitcoin Price by the 200 day moving average of the price.')
+
+
+        if st.button('**Evaluate the current situation**'):
+
+            if df['metric'][-1] > 2:
+                st.subheader('Probably a :red[risk] :small_red_triangle_down:')
+            
+            elif df['metric'][-1] > 1:
+                st.subheader('Neutral risk :bar_chart:')
+
+            else :
+                st.subheader('Probably an :green[opportunity] :crossed_flags:')
+
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+            st.plotly_chart(viz_with_indicator(df, checkbox_val, True, 1, indicateur, False),
+                    use_container_width=True)     
+            
+        with tab2:
+            st.header("ML is comming")   
+
+
+    elif indicateur == 'Puell Multiple':
+        st.header('Bitcoin `Puell Multiple`')
+        df = df_btc.copy()
+        df['365d_ma'] = df['Close'].rolling(365).mean()
+        df['metric'] = df['Close'] / df['365d_ma']
+        df = df[-days_to_plot:]
+
+
+        col1, col2 = st.columns(2)
+        col1.metric("Last  price Bitcoin", round(df['Close'][-1],0), round((df['Close'][-1]/df['Close'][-2] - 1)*100,2))
+        col2.metric("Last  Puell Multiple", round(df['metric'][-1],2), round((df['metric'][-1]/df['metric'][-2] - 1)*100,2))
+        st.write('The Puell Multiple is calculated by dividing the Bitcoin Price by the 365 day moving average of the price.')
+
+
+        if st.button('**Evaluate the current situation**'):
+
+            if df['metric'][-1] > 2:
+                st.subheader('Probably a :red[risk] :small_red_triangle_down:')
+            
+            elif df['metric'][-1] > 1:
+                st.subheader('Neutral risk :bar_chart:')
+
+            else :
+                st.subheader('Probably an :green[opportunity] :crossed_flags:')
+
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+            st.plotly_chart(viz_with_indicator(df, checkbox_val, True, 1, indicateur, False),
+                    use_container_width=True)     
+            
+        with tab2:
+            st.header("ML is comming")   
+
+
+
 elif categorie == 'Macro':
     if indicateur == 'Masse Monétaire': 
 
         st.header('Bitcoin vs `money printing (ECB+FED)` :money_with_wings:')
 
-        st.caption('Traditional currency can be "printed" without limits by central banks.\n\n'
+        st.write('Traditional currency can be "printed" without limits by central banks.\n\n'
            'The `higher` M2 goes, the `higher` bitcoin price could go. When central banks end easing and start to hike rates, bitcoin price could :red[drop].')
 
         df_usd = pd.DataFrame(M2_usd())
@@ -435,10 +501,10 @@ elif categorie == 'Macro':
         if st.button('**Evaluate the current situation**'):
 
             if df ['M2_sum'][-1] > df ['M2_sum'][-31]:
-                st.subheader('Currently we are in a :green[money printing market] :rocket:')
+                st.subheader('We are currently  in a :green[money printing market] :rocket:')
 
             else :
-                st.subheader('Currently we are in a :red[tightning] :bear:')
+                st.subheader('We are currently  in a :red[tightning] :bear:')
 
 
 
@@ -461,7 +527,7 @@ elif categorie == 'Macro':
             #dxy.index = pd.to_datetime(df.index)
             dxy.to_csv('data/datos/dxy.csv')
 
-        st.caption('The dollar index tracks the relative value of the U.S. dollar against a basket of important world currencies.\n'
+        st.write('The dollar index tracks the relative value of the U.S. dollar against a basket of important world currencies.\n'
                 'If the index is :red[rising], it means that the dollar is strengthening against the basket - and vice-versa.\n\n'
                 'USD tends to appreciate in a deleveraging and derisking period. :bear:\n\n'
                 'USD tends to depreciate in a risk-taking period with low interest rates and quantitative easing. :money_with_wings:')
@@ -519,7 +585,7 @@ elif categorie == 'Mining':
         df = df[-days_to_plot:]
         
 
-        st.caption('The hashrate is the computing power miners use to secure the Bitcoin network. \n\n'
+        st.write('The hashrate is the computing power miners use to secure the Bitcoin network. \n\n'
                     "When the hashrate :red[drops], it means that miners are closing, maybe selling assets (like bitocin) and the bitcoin's netowrk is less secure. :bear: \n\n"
                     'When the hashrate :green[rises], it :  \n\n'
                     '- increased difficulty which makes it more costly to mine Bitcoin.  \n\n'
@@ -583,7 +649,29 @@ elif categorie == 'Mining':
         
         st.header(f'You are looking at `{indicateur}` from the category `{categorie}`')
         df = df[-days_to_plot:]
-        
+    
+        st.write('The total BTC value of all transaction fees paid to miners. \n\n'
+                    "Decrease = :red[less] demand :man_with_probing_cane: \n\n"
+                    'Increase = :green[higher] demand :man-woman-girl-girl: \n\n'
+        )
+
+        days = st.number_input(
+            'Number of days to compare',
+            min_value=1,
+            max_value=3650,
+            value=30,
+            step=1
+        )
+
+        if st.button('**Evaluate the current situation**'):        
+
+            if df ['metric'][-1] > df ['metric'][-days-1:].mean():
+                st.subheader(f"{indicateur} is currently :green[higher] than the **{days}** last days' average. :rocket:")
+
+            else :
+                st.subheader(f"{indicateur} is currently :red[lower] than the **{days}** last days' average. :bear:")
+
+
 
         st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, indicateur,checkbox_zscore ),
                         use_container_width=True)   
@@ -593,8 +681,24 @@ elif categorie == 'Mining':
         df = on_chain_merge('fees', indicateur)
         st.header(f'You are looking at `{indicateur}` from the category `mining`')
         df = df[-days_to_plot:]
-        st.caption('The total amount of fees paid to miners. Inflation rewards not included. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
+        st.write('The total amount of fees paid to miners. Inflation rewards not included. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
 
+
+        days = st.number_input(
+            'Number of days to compare',
+            min_value=1,
+            max_value=3650,
+            value=30,
+            step=1
+        )
+
+        if st.button('**Evaluate the current situation**'):        
+
+            if df ['metric'][-1] > df ['metric'][-days-1:].mean():
+                st.subheader(f"{indicateur} is currently :green[higher] than the **{days}** last days' average. :rocket:")
+
+            else :
+                st.subheader(f"{indicateur} is currently :red[lower] than the **{days}** last days' average. :bear:")
 
         st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, 'fees', indicateur, checkbox_zscore ),
                         use_container_width=True)   
@@ -605,8 +709,89 @@ elif categorie == 'Mining':
 
 elif categorie == 'On-Chain':
     
+    if onchain == 'balances':
+        try: df = pd.read_csv('data/datos/merged_balances.csv', index_col= 'date')
 
-    if metrics == 'unique-addresses':
+        except:
+            base_url = 'https://min-api.cryptocompare.com/data/blockchain/balancedistribution/histo/day?fsym='
+            df_raw = api_call(f'{base_url}btc&limit=2000')
+            df_distr = prepare_balancedistribution_data(df_raw)
+            f_0_0_to_0_001 = df_distr[::9] 
+            f_0_001_to_0_01 = df_distr[1::9] 
+            df_merged = f_0_0_to_0_001.merge(f_0_001_to_0_01, left_on='date', right_on ='date' )
+            df_merged['totalVolume'] = df_merged.totalVolume_x + df_merged.totalVolume_y
+            df_merged['addressesCount'] = df_merged.addressesCount_x + df_merged.addressesCount_y
+
+            #final categories:
+            less_than_0_01 = df_merged.drop(columns = df_merged.iloc[:,1:-2])
+            f_0_01_to_0_1= df_distr[2::9].drop(columns='range')
+            f_0_1_to_1 = df_distr[3::9].drop(columns='range')
+            f_1_to_10 = df_distr[4::9] .drop(columns='range')
+            f_10_to_100 = df_distr[5::9] .drop(columns='range')
+            f_100_to_1000 = df_distr[6::9] .drop(columns='range')
+            f_1000_to_10000 = df_distr[7::9] .drop(columns='range')
+            f_10000_to_100000 = df_distr[8::9] .drop(columns='range')
+            
+            #Rename 
+            less_than_0_01.columns= ['date','totalVolume_less_than_0_01','addressesCount_less_than_0_01']
+            f_0_01_to_0_1.columns= ['date','totalVolume_f_0_01_to_0_1','addressesCount_f_0_01_to_0_1']
+            f_0_1_to_1.columns= ['date','totalVolume_f_0_1_to_1','addressesCount_f_0_1_to_1']
+            f_1_to_10.columns= ['date','totalVolume_f_1_to_10','addressesCount_f_1_to_10']
+            f_10_to_100.columns= ['date','totalVolume_f_10_to_100','addressesCount_f_10_to_100']
+            f_100_to_1000.columns= ['date','totalVolume_f_100_to_1000','addressesCount_f_100_to_1000']
+            f_1000_to_10000.columns= ['date','totalVolume_f_1000_to_10000','addressesCount_f_1000_to_10000']
+            f_10000_to_100000.columns= ['date','totalVolume_f_10000_to_100000','addressesCount_f_10000_to_100000']
+
+            #merging
+            df_btc.index = pd.to_datetime(df_btc.index)
+            df = df_btc.merge(less_than_0_01,left_index= True, right_on='date').merge(f_0_01_to_0_1, left_on='date', right_on='date').merge(f_0_1_to_1, left_on='date', right_on='date').merge(f_0_1_to_1, left_on='date', right_on='date').merge(f_0_1_to_1, left_on='date', right_on='date').merge(f_1_to_10, left_on='date', right_on='date').merge(f_10_to_100, left_on='date', right_on='date').merge(f_100_to_1000, left_on='date', right_on='date').merge(f_1000_to_10000, left_on='date', right_on='date').merge(f_10000_to_100000, left_on='date', right_on='date')
+            df.to_csv('data/datos/merged_balances.csv')
+
+
+        df = df[-days_to_plot:]
+
+
+
+
+        if type_balance == 'Adresses Count':
+            st.header(f'You are looking at `{type_balance}` from the category `{onchain}`')
+            st.write('You are looking at the number of adresses per cohort. \n\n'
+                    'It is relevant to observe which actors are entering or leaving the market.'
+                    "Are there the :blue[whales] which are often instutional actors which can have an impact on the Bitcoin's price. :fish: \n\n"
+                    'Or, are there smaller actors which can be more emotional but who decentralise the network. :fishing_pole_and_fish:'
+            )
+
+
+            st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma,type_balance, metrics, checkbox_zscore),
+                use_container_width=True)     
+            
+        elif type_balance == 'Balances':
+            st.header(f'You are looking at `{type_balance}` from the category `{onchain}`')
+            st.write('You are looking at the total Bitcoin holdings per cohort. \n\n'
+                    ':green[Note that:]  Based on historical data, the smartest cohort are the 10 to 100 btc. \n\n'
+                    ':red[Note that:]  Based on historical data, the most emotional cohort are the smallest ones (<1btc).'
+
+            )
+            days = st.number_input(
+            'Number of days to compare',
+            min_value=1,
+            max_value=2000,
+            value=30,
+            step=1
+            )
+            if st.button('**Evaluate the current situation**'):
+                if df['totalVolume_f_10_to_100'].iloc[-1] > df ['totalVolume_f_10_to_100'].iloc[-days]:
+                    st.subheader(f"The 10 to 100btc, which are the smartest cohort, are :green[accumulating] since the **{days}** last days. :rocket:")
+                else :
+                    st.subheader(f"The 10 to 100btc, which are the smartest cohort, are :red[offloading] since the **{days}** last days. :bear:")
+
+
+            st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma, type_balance,metrics, checkbox_zscore),
+                use_container_width=True)    
+
+
+
+    elif metrics == 'unique-addresses':
 
         try : 
             df = pd.read_csv(f'data/datos/{categorie}_{metrics}.csv', index_col='timestamp')
@@ -633,10 +818,28 @@ elif categorie == 'On-Chain':
         
         st.header(f'You are looking at `{metrics}` from the category `{categorie}`')
 
-        st.caption('Total number of unique addresses used on the blockchain. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
+        st.write('Total number of unique addresses used on the blockchain. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
 
         df = df[-days_to_plot:]
         
+        
+        days = st.number_input(
+            'Number of days to compare',
+            min_value=1,
+            max_value=2000,
+            value=30,
+            step=1
+            )
+                
+        if st.button('**Evaluate the current situation**'):
+            if df['metric'].iloc[-1] > df ['metric'].iloc[-days:-1].mean():
+                st.subheader(f"{metrics} is :green[higher] than compared to the last **{days}** days' average. :rocket:")
+            else :
+                st.subheader(f"{metrics} is :red[lower] than compared to the last **{days}** days' average. :bear:")
+        col1, col2 = st.columns(2)
+        col1.metric(f"Last value for {metrics}", df['metric'].iloc[-1] )
+        col2.metric(f"Average value of the last **{days}** days of {metrics}", round(df['metric'].iloc[-days:-1].mean(),0) )
+
         st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, metrics,checkbox_zscore ),
                         use_container_width=True)   
 
@@ -646,6 +849,23 @@ elif categorie == 'On-Chain':
         df = on_chain_merge(onchain, metrics)
         st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
         df = df[-days_to_plot:]
+
+        days = st.number_input(
+            'Number of days to compare',
+            min_value=1,
+            max_value=2000,
+            value=30,
+            step=1
+            )
+                
+        if st.button('**Evaluate the current situation**'):
+            if df['metric'].iloc[-1] > df ['metric'].iloc[-days:-1].mean():
+                st.subheader(f"{metrics} is :green[higher] than compared to the last **{days}** days' average. :rocket:")
+            else :
+                st.subheader(f"{metrics} is :red[lower] than compared to the last **{days}** days' average. :bear:")
+        col1, col2 = st.columns(2)
+        col1.metric(f"Last value for {metrics}", round(df['metric'].iloc[-1],2) )
+        col2.metric(f"Average value of the last **{days}** days of {metrics}", round(df['metric'].iloc[-days:-1].mean(),2) )
 
         st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, onchain, metrics,checkbox_zscore ),
                         use_container_width=True)   
