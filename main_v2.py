@@ -14,6 +14,9 @@ import yfinance as yf
 from datetime import datetime
 import requests
 import cryptocompare as cc
+from PIL import Image
+from fbprophet import Prophet
+import matplotlib.pyplot as plt
 
 
 df_btc = btc()
@@ -309,7 +312,30 @@ if categorie == 'Technique':
                 use_container_width=True)    
            
         with tab2:
-            st.header('ML is comming')
+           # try:
+            #    forecast = pd.read_csv(f'data/prophet/prophet{indicateur}.csv')
+
+            #except:
+            df_fb = df.reset_index(drop= False)
+            df_fb = df_fb[['timestamp', 'Close']]
+            df_fb.columns=['ds', 'y']
+            model=Prophet().fit(df_fb)
+            future=model.make_future_dataframe(periods=720, freq='D')
+            forecast=model.predict(future)
+            forecast=forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']][forecast.ds> datetime.today() ]
+
+            forecast.columns=['time', 'close', 'lower', 'upper']
+            st.table(forecast.head())
+            #forecast.to_csv(f'data/prophet/prophet{indicateur}.csv')
+            forecast.set_index('time', inplace = True)
+            fig = plt(forecast)
+            #fig=model.plot(forecast)
+            st.pyplot(fig)
+
+
+            
+
+
 
 
     elif indicateur == 'Bull-Market Support Bands': 
