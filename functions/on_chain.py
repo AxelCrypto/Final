@@ -2,6 +2,7 @@ import json
 import requests
 import pandas as pd
 from functions.get_btc import btc
+import time
 
 with open('api.txt') as api:
     api = api.readlines()
@@ -13,9 +14,12 @@ def glassnode(url):
     # make API request
     res = requests.get(f'https://api.glassnode.com{url}',
         params={'a': 'BTC', 'api_key': API_KEY})
+    
+
 
     # convert to pandas dataframe
     df = pd.read_json(res.text, convert_dates=['t'])
+    time.sleep(1)
     df.columns = ['timestamp',url.split('/')[-1]]
     return df
 
@@ -25,6 +29,8 @@ def on_chain_df(categorie, metric):
     except:
         url =  '/v1/metrics/' + str(categorie)  +'/' + str(metric)
         df = glassnode(url).copy()
+        time.sleep(1)
+
         df.set_index('timestamp',inplace = True)
         df.columns = ['metric']
         df.to_csv(f'data/datos/{categorie}_{metric}.csv')
@@ -45,6 +51,7 @@ def on_chain_merge(categorie, metric):
             df_merged = df_merged.merge(pd.json_normalize(df_merged.stock_to_flow_ratio), left_index= True, right_index=True)
             del df_merged['stock_to_flow_ratio']
             del df_merged['price']
+            time.sleep(1)
             df_merged.set_index('timestamp', drop=True, inplace = True)
             df_merged.columns = ['days','metric']
             df_btc = btc().copy()
@@ -64,7 +71,10 @@ def on_chain_merge(categorie, metric):
 
         except:
             df = on_chain_df(categorie, metric).copy()
+            time.sleep(4)
             df['timestamp'] = pd.to_datetime(df['timestamp'])
+            #time.sleep(2)
+
             df.set_index('timestamp', drop = True, inplace = True)
             df_btc = btc().copy()
             df_btc.index = pd.to_datetime(df_btc.index)

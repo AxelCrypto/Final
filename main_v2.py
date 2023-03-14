@@ -24,7 +24,7 @@ import plotly.graph_objs as go
 df_btc = btc()
 
 st.set_page_config(
-    page_title="Bitcoin's inside",
+    page_title="Inside Bitcoin's Price Rabbit hole",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -46,6 +46,7 @@ categories.append('balances')
 
 # titre sidebar
 st.sidebar.header('Dashboard')
+
 
 #st.sidebar.subheader('Données')
 categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Mining', 'On-Chain'))
@@ -115,7 +116,11 @@ else:
         elif onchain == 'transactions':
             metrics = st.selectbox("**metrics**", ('count','size_mean','count'))
         elif onchain == 'indicators':
-            metrics = st.selectbox("**metrics**", ('sopr','stock_to_flow_ratio','pi_cycle_top'))
+            metrics = st.selectbox("**metrics**", ('sopr',
+                                                   'stock_to_flow_ratio'
+                                                   ,
+                                                   #'pi_cycle_top'
+                                                   ))
         elif onchain == 'supply':
             metrics = 'active_more_1y_percent'
         elif onchain == 'market':
@@ -152,6 +157,7 @@ Data should NOT be used for trading and investing.
 
 if categorie == 'Technique':
     if indicateur == 'Price': 
+        st.title(":green[GM Satoshi] 🕵️, Welcome to the *Bitcoin's Price Rabbit hole!*")
         st.header('Bitcoin `Actual price`')
         st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
         df = df_btc.copy()
@@ -862,7 +868,7 @@ if categorie == 'Technique':
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
                 st.plotly_chart(fig2)
                 
-                
+
 elif categorie == 'Macro':
     if indicateur == 'Masse Monétaire': 
 
