@@ -430,16 +430,20 @@ if categorie == 'Technique':
         with tab1:
             st.plotly_chart(get_candlestick_plot_ma(df, checkbox_val, 'btc' ),
                 use_container_width=True)   
-            
-        with tab2:
-            st.subheader(f':blue[Prediction based on fbprophet, based on historical price and its correlation with{indicateur}]')
-            st.markdown("Note that the output can take time.")
 
+
+        with tab2:
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
+            st.markdown("Note that the output can take time.")
+            
+
+            
             c1, c2 = st.columns(2)
             with c1:
                 view = st.radio(
                     ":blue[Select view] :chart_with_upwards_trend:",
-                    key="logarithmic",
+                    key="linear",
                     options=["linear", "logarithmic"],
                 )
 
@@ -447,72 +451,69 @@ if categorie == 'Technique':
                 time = st.radio(
                     ":blue[Select timeframe] :hourglass_flowing_sand:",
                     key="weekly",
-                    options=["daily", "weekly", 'monthly'],
+                    options=["daily", "weekly"],
                 )
 
             if st.button('**Make Prediction**'):
-                df_fb = df_btc.reset_index(drop= False)
-                df_fb['metric'] = df_fb['Close'].rolling(140).mean()
-                df_fb.dropna(inplace = True)
-
-                df = df_fb[['timestamp','Close', 'metric']]
-                df.columns = ['ds','y', 'metric']
+                st.write(df.head())
+                df.reset_index(drop = False, inplace = True)
+                df['metric'] = df['Close'].rolling(140).mean()
+                df = df[['timestamp', 'Close', 'metric']]
+                df.dropna(inplace = True)
+                df.columns = ['ds', 'y', 'metric']
                 
-                st.write(df.isna().sum())
-
                 if view == "logarithmic":
                     df['y']= np.log(df.y)
                 else: pass
 
-                if time == 'days':
+                if time == 'daily':
                     pass
+                
                 elif time == 'weekly':
-                    df = df[::7]
-                elif time == 'monthly':
-                    df = df[::30]
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
 
 
-                model = Prophet(
-                    daily_seasonality= True,
-                    weekly_seasonality= True,
-                    yearly_seasonality = True
-                )
                 model.add_regressor('metric')
                 model.fit(df)
 
-                if time == 'daily':
-                    days = 60
-                    future_dates = model.make_future_dataframe(periods = days, freq='D')
-                    future_dates['metric'] = df['metric']
 
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
                     st.subheader(f':blue[Prediction at {days} days: ]')
 
                 elif time == 'weekly':
                     weeks = 45
                     future_dates = model.make_future_dataframe(periods = weeks, freq='W')
-                    future_dates['metric'] = df['metric']
-
                     st.subheader(f':blue[Prediction at {weeks} weeks: ]')
 
-                elif time == 'monthly':
-                    months = 12
-                    future_dates = model.make_future_dataframe(periods = months, freq='M')
-                    future_dates['metric'] = df['metric']
 
-                    st.subheader(f':blue[Prediction at {months} months: ]')
+                
+                future_dates['metric'] = df['metric']
+                
 
-                st.write(future_dates.head())
-                prediction = model.predict(future_dates)
+                prediction = model.predict(future_dates.dropna())
+
                 fig = plot_plotly(model, prediction)
 
-                #st.subheader(f':blue[Prediction at {days} days: ]')
                 st.plotly_chart(go.Figure(fig))
             
                 fig2 = plot_components_plotly(model, prediction)
                 
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
                 st.plotly_chart(fig2)
-
+                
     elif indicateur == 'EHMA': 
         st.header('Bitcoin `EHMA`')
 
@@ -536,10 +537,6 @@ if categorie == 'Technique':
         close_ema2 = borserman_ema(df['Close'], period)
         ehma = borserman_ema(2 * close_ema1 - close_ema2, sqrt_period)
         
-        #col1, col2, col3 = st.columns(3)
-        #st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
-        #col2.metric("Last  price 21w EMA", round(df['21w_ema'][-1],0), round((df['21w_ema'][-1]/df['21w_ema'][-2] - 1)*100,2))
-        #col3.metric("Last  price 20w SMA", round(df['20w_sma'][-1],0), round((df['20w_sma'][-1]/df['20w_sma'][-2] - 1)*100,2))
         st.write('**Traditional moving averages lag the price activity. But with some clever mathematics the lag can be minimised. If green we are in a :green[bullmarkets], if red we are in a :red[bearmarkets]**')
 
 
@@ -564,8 +561,87 @@ if categorie == 'Technique':
                 st.plotly_chart(get_candlestick_plot_EHMA(df, False, 'btc'),
                     use_container_width=True)     
         
+
         with tab2:
-             st.header('Machine Learning is Coming')
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
+            st.markdown("Note that the output can take time.")
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="linear",
+                    options=["linear", "logarithmic"],
+                )
+
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly"],
+                )
+
+            if st.button('**Make Prediction**'):
+                df.reset_index(drop = False, inplace = True)
+                df['metric'] = ehma
+
+                df = df[['timestamp', 'Close', 'metric']]
+                df.dropna(inplace = True)
+                df.columns = ['ds', 'y', 'metric']
+                
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'daily':
+                    pass
+                
+                elif time == 'weekly':
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                model.add_regressor('metric')
+                model.fit(df)
+
+
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 45
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                
+                future_dates['metric'] = df['metric']
+                
+
+                prediction = model.predict(future_dates.dropna())
+
+                fig = plot_plotly(model, prediction)
+
+                st.plotly_chart(go.Figure(fig))
+            
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
+                
 
     elif indicateur == 'Mayer Multiple':
         st.header('Bitcoin `Mayer Multiple`')
@@ -597,9 +673,85 @@ if categorie == 'Technique':
         with tab1:
             st.plotly_chart(viz_with_indicator(df, checkbox_val, True, 1, indicateur, False),
                     use_container_width=True)     
-            
+
         with tab2:
-            st.header("ML is comming")   
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
+            st.markdown("Note that the output can take time.")
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="linear",
+                    options=["linear", "logarithmic"],
+                )
+
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly"],
+                )
+
+            if st.button('**Make Prediction**'):
+                df.reset_index(drop = False, inplace = True)
+                df = df[['timestamp', 'Close', 'metric']]
+                df.dropna(inplace = True)
+                df.columns = ['ds', 'y', 'metric']
+                
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'daily':
+                    pass
+                
+                elif time == 'weekly':
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                model.add_regressor('metric')
+                model.fit(df)
+
+
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 45
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                
+                future_dates['metric'] = df['metric']
+                
+
+                prediction = model.predict(future_dates.dropna())
+
+                fig = plot_plotly(model, prediction)
+
+                st.plotly_chart(go.Figure(fig))
+            
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
+                
 
     elif indicateur == 'Puell Multiple':
         st.header('Bitcoin `Puell Multiple`')
@@ -633,8 +785,84 @@ if categorie == 'Technique':
                     use_container_width=True)     
             
         with tab2:
-            st.header("ML is comming")   
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
+            st.markdown("Note that the output can take time.")
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="linear",
+                    options=["linear", "logarithmic"],
+                )
 
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly"],
+                )
+
+            if st.button('**Make Prediction**'):
+                df.reset_index(drop = False, inplace = True)
+                df = df[['timestamp', 'Close', 'metric']]
+                df.dropna(inplace = True)
+                df.columns = ['ds', 'y', 'metric']
+                
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'daily':
+                    pass
+                
+                elif time == 'weekly':
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                model.add_regressor('metric')
+                model.fit(df)
+
+
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 45
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                
+                future_dates['metric'] = df['metric']
+                
+
+                prediction = model.predict(future_dates.dropna())
+
+                fig = plot_plotly(model, prediction)
+
+                st.plotly_chart(go.Figure(fig))
+            
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
+                
+                
 elif categorie == 'Macro':
     if indicateur == 'Masse Monétaire': 
 
@@ -908,7 +1136,6 @@ elif categorie == 'Macro':
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
                 st.plotly_chart(fig2)
                 
-
 
 elif categorie == 'Mining':
     if indicateur == 'Hashrate': 
@@ -1387,9 +1614,101 @@ elif categorie == 'On-Chain':
                     'Or, are there smaller actors which can be more emotional but who decentralise the network. :fishing_pole_and_fish:'
             )
 
+            tab1, tab2= st.tabs(["Chart", "Prediction"])
 
-            st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma,type_balance, metrics, checkbox_zscore),
-                use_container_width=True)     
+            with tab1:
+
+
+                st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma,type_balance, metrics, checkbox_zscore),
+                    use_container_width=True)     
+
+
+            with tab2:
+                st.title(':blue[Prediction based on fbprophet]')
+                st.subheader(f'Based on historical price and its correlation with {metrics}')
+                st.subheader(':red[Attention, only 2000 days of data !]')
+                st.markdown("Note that the output can take time.")
+                
+
+                
+                c1, c2 = st.columns(2)
+                with c1:
+                    view = st.radio(
+                        ":blue[Select view] :chart_with_upwards_trend:",
+                        key="linear",
+                        options=["linear", "logarithmic"],
+                    )
+
+                with c2:
+                    time = st.radio(
+                        ":blue[Select timeframe] :hourglass_flowing_sand:",
+                        key="weekly",
+                        options=["daily", "weekly"],
+                    )
+
+                if st.button('**Make Prediction**'):
+                    df.reset_index(drop = False, inplace = True)
+                    dic=  {'<0.01':'less_than_0_01', '0.01 - 0.1': 'f_0_01_to_0_1' ,'0.1 - 1': 'f_0_1_to_1', '1 - 10' : 'f_1_to_10', '10 - 100' : 'f_10_to_100','100 - 1000' : 'f_100_to_1000', '1k - 10k' : 'f_1000_to_10000','10k+' : 'f_10000_to_100000', 'all': 'all'}
+
+                    ind = 'addressesCount_' + dic[metrics]
+                    df['metric'] = df[ind]
+
+                    df = df[['date','Close','metric']]
+                    df.columns = ['ds','y','metric']
+                    
+                    if view == "logarithmic":
+                        df['y']= np.log(df.y)
+                    else: pass
+
+                    if time == 'daily':
+                        pass
+                    
+                    elif time == 'weekly':
+                        df = df.iloc[::7]
+
+                
+                    # Initialize Prophet model with regressor and fit to data
+
+                    model = Prophet()
+
+                    if time == 'daily':
+                        model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                    elif time == 'weekly':
+                        model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                    model.add_regressor('metric')
+                    model.fit(df)
+
+
+                    # Make predictions and plot the results
+                    if time == 'daily':
+                        days = 90
+                        future_dates = model.make_future_dataframe(periods = days, freq='D')
+                        st.subheader(f':blue[Prediction at {days} days: ]')
+
+                    elif time == 'weekly':
+                        weeks = 45
+                        future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                        st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                    
+                    future_dates['metric'] = df['metric']
+                    
+
+                    prediction = model.predict(future_dates.dropna())
+
+                    fig = plot_plotly(model, prediction)
+
+                    st.plotly_chart(go.Figure(fig))
+                
+                    fig2 = plot_components_plotly(model, prediction)
+                    
+                    st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                    st.plotly_chart(fig2)
+                
+
             
         elif type_balance == 'Balances':
             st.header(f'You are looking at `{type_balance}` from the category `{onchain}`')
@@ -1411,10 +1730,100 @@ elif categorie == 'On-Chain':
                 else :
                     st.subheader(f"The 10 to 100btc, which are the smartest cohort, are :red[offloading] since the **{days}** last days. :bear:")
 
+            tab1, tab2= st.tabs(["Chart", "Prediction"])
 
-            st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma, type_balance,metrics, checkbox_zscore),
-                use_container_width=True)    
+            with tab1:
 
+
+                st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma, type_balance,metrics, checkbox_zscore),
+                    use_container_width=True)    
+
+
+            with tab2:
+                st.title(':blue[Prediction based on fbprophet]')
+                st.subheader(f'Based on historical price and its correlation with {metrics}')
+                st.subheader(':red[Attention, only 2000 days of data !]')
+                st.markdown("Note that the output can take time.")
+                
+
+                
+                c1, c2 = st.columns(2)
+                with c1:
+                    view = st.radio(
+                        ":blue[Select view] :chart_with_upwards_trend:",
+                        key="linear",
+                        options=["linear", "logarithmic"],
+                    )
+
+                with c2:
+                    time = st.radio(
+                        ":blue[Select timeframe] :hourglass_flowing_sand:",
+                        key="weekly",
+                        options=["daily", "weekly"],
+                    )
+
+                if st.button('**Make Prediction**'):
+                    df.reset_index(drop = False, inplace = True)
+                    dic=  {'<0.01':'less_than_0_01', '0.01 - 0.1': 'f_0_01_to_0_1' ,'0.1 - 1': 'f_0_1_to_1', '1 - 10' : 'f_1_to_10', '10 - 100' : 'f_10_to_100','100 - 1000' : 'f_100_to_1000', '1k - 10k' : 'f_1000_to_10000','10k+' : 'f_10000_to_100000', 'all': 'all'}
+
+                    ind = 'addressesCount_' + dic[metrics]
+                    df['metric'] = df[ind]
+
+                    df = df[['date','Close','metric']]
+                    df.columns = ['ds','y','metric']
+                    
+                    if view == "logarithmic":
+                        df['y']= np.log(df.y)
+                    else: pass
+
+                    if time == 'daily':
+                        pass
+                    
+                    elif time == 'weekly':
+                        df = df.iloc[::7]
+
+                
+                    # Initialize Prophet model with regressor and fit to data
+
+                    model = Prophet()
+
+                    if time == 'daily':
+                        model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                    elif time == 'weekly':
+                        model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                    model.add_regressor('metric')
+                    model.fit(df)
+
+
+                    # Make predictions and plot the results
+                    if time == 'daily':
+                        days = 90
+                        future_dates = model.make_future_dataframe(periods = days, freq='D')
+                        st.subheader(f':blue[Prediction at {days} days: ]')
+
+                    elif time == 'weekly':
+                        weeks = 45
+                        future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                        st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                    
+                    future_dates['metric'] = df['metric']
+                    
+
+                    prediction = model.predict(future_dates.dropna())
+
+                    fig = plot_plotly(model, prediction)
+
+                    st.plotly_chart(go.Figure(fig))
+                
+                    fig2 = plot_components_plotly(model, prediction)
+                    
+                    st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                    st.plotly_chart(fig2)
+                
 
 
     elif metrics == 'unique-addresses':
@@ -1466,10 +1875,94 @@ elif categorie == 'On-Chain':
         col1.metric(f"Last value for {metrics}", df['metric'].iloc[-1] )
         col2.metric(f"Average value of the last **{days}** days of {metrics}", round(df['metric'].iloc[-days:-1].mean(),0) )
 
-        st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, metrics,checkbox_zscore ),
-                        use_container_width=True)   
+
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+
+            st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, metrics,checkbox_zscore ),
+                            use_container_width=True)   
 
 
+        with tab2:
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {metrics}')
+            st.markdown("Note that the output can take time.")
+            
+
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="linear",
+                    options=["linear", "logarithmic"],
+                )
+
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly"],
+                )
+
+            if st.button('**Make Prediction**'):
+                df.reset_index(drop = False, inplace = True)
+                df = df[['timestamp', 'Close', 'metric']]
+                df.columns = ['ds', 'y', 'metric']
+                
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'daily':
+                    pass
+                
+                elif time == 'weekly':
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                model.add_regressor('metric')
+                model.fit(df)
+
+
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 45
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                
+                future_dates['metric'] = df['metric']
+                
+
+                prediction = model.predict(future_dates.dropna())
+
+                fig = plot_plotly(model, prediction)
+
+                st.plotly_chart(go.Figure(fig))
+            
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
+                
 
     else:
         df = on_chain_merge(onchain, metrics)
@@ -1493,5 +1986,94 @@ elif categorie == 'On-Chain':
         col1.metric(f"Last value for {metrics}", round(df['metric'].iloc[-1],2) )
         col2.metric(f"Average value of the last **{days}** days of {metrics}", round(df['metric'].iloc[-days:-1].mean(),2) )
 
-        st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, onchain, metrics,checkbox_zscore ),
-                        use_container_width=True)   
+
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+
+
+            st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, onchain, metrics,checkbox_zscore ),
+                            use_container_width=True)   
+
+
+        with tab2:
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {metrics}')
+            st.markdown("Note that the output can take time.")
+            
+
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="linear",
+                    options=["linear", "logarithmic"],
+                )
+
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly"],
+                )
+
+            if st.button('**Make Prediction**'):
+                df.reset_index(drop = False, inplace = True)
+                df = df[['timestamp', 'Close', 'metric']]
+                df.columns = ['ds', 'y', 'metric']
+                
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'daily':
+                    pass
+                
+                elif time == 'weekly':
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                model.add_regressor('metric')
+                model.fit(df)
+
+
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 45
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                
+                future_dates['metric'] = df['metric']
+                
+
+                prediction = model.predict(future_dates.dropna())
+
+                fig = plot_plotly(model, prediction)
+
+                st.plotly_chart(go.Figure(fig))
+            
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
+                
+
+
