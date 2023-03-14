@@ -17,6 +17,8 @@ import cryptocompare as cc
 from PIL import Image
 from fbprophet import Prophet
 import matplotlib.pyplot as plt
+from fbprophet.plot import plot_plotly, plot_components_plotly
+import plotly.graph_objs as go
 
 
 df_btc = btc()
@@ -140,7 +142,8 @@ else:
 st.sidebar.markdown('''
 ---
 GM Satoshi 🕵️  
-NFA, by [Axel](https://www.youtube.com/c/AxelGirouGarcia).
+By [Axel](https://twitter.com/AxelCryptoytb).    
+Data should NOT be used for trading and investing.
 ''')
 
 
@@ -312,29 +315,73 @@ if categorie == 'Technique':
                 use_container_width=True)    
            
         with tab2:
-           # try:
-            #    forecast = pd.read_csv(f'data/prophet/prophet{indicateur}.csv')
-
-            #except:
-            df_fb = df.reset_index(drop= False)
-            df_fb = df_fb[['timestamp', 'Close']]
-            df_fb.columns=['ds', 'y']
-            model=Prophet().fit(df_fb)
-            future=model.make_future_dataframe(periods=720, freq='D')
-            forecast=model.predict(future)
-            forecast=forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']][forecast.ds> datetime.today() ]
-
-            forecast.columns=['time', 'close', 'lower', 'upper']
-            st.table(forecast.head())
-            #forecast.to_csv(f'data/prophet/prophet{indicateur}.csv')
-            forecast.set_index('time', inplace = True)
-            fig = plt(forecast)
-            #fig=model.plot(forecast)
-            st.pyplot(fig)
+            st.subheader(':blue[Prediction based on fbprophet]')
+            st.markdown("Note that the output can take time.")
 
 
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="logarithmic",
+                    options=["linear", "logarithmic"],
+                )
+
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly", 'monthly'],
+                )
+
+            if st.button('**Make Prediction**'):
+
+                df_fb = df.reset_index(drop= False)
+                df = df_fb[['timestamp','Close']]
+                df.columns = ['ds','y']
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'days':
+                    pass
+                elif time == 'weekly':
+                    df = df[::7]
+                elif time == 'monthly':
+                    df = df[::30]
+
+                model = Prophet()
+                model.fit(df)
+                
+
+                if time == 'daily':
+                    days = 60
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 56
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+                elif time == 'monthly':
+                    months = 12
+                    future_dates = model.make_future_dataframe(periods = months, freq='M')
+                    st.subheader(f':blue[Prediction at {months} months: ]')
+
+                    
+                prediction = model.predict(future_dates)
+
+
+                fig = plot_plotly(model, prediction)
+
+                #st.subheader(f':blue[Prediction at {days} days: ]')
+                st.plotly_chart(go.Figure(fig))
             
-
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
 
 
 
