@@ -15,7 +15,7 @@ def M2_usd():
 
     fred.set_api_key_file('functions/data/API Fred.txt')
 
-    M2 = fred.get_series_df('M2SL')
+    M2 = fred.get_series_df('WM2NS')
 
     del M2 ['realtime_start']
     #del M2 ['realtime_end']
