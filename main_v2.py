@@ -166,7 +166,8 @@ if categorie == 'Technique':
                 use_container_width=True)    
            
         with tab2:
-            st.subheader(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader('Based on historical price only')
             st.markdown("Note that the output can take time.")
 
 
@@ -431,7 +432,7 @@ if categorie == 'Technique':
                 use_container_width=True)   
             
         with tab2:
-            st.subheader(':blue[Prediction based on fbprophet]')
+            st.subheader(f':blue[Prediction based on fbprophet, based on historical price and its correlation with{indicateur}]')
             st.markdown("Note that the output can take time.")
 
             c1, c2 = st.columns(2)
@@ -674,7 +675,8 @@ elif categorie == 'Macro':
                             use_container_width=True)   
 
         with tab2:
-            st.subheader(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader('Based on historical price and its correlation with M2 (Eur + USD)')
             st.markdown("Note that the output can take time.")
 
 
@@ -809,8 +811,104 @@ elif categorie == 'Macro':
             else :
                 st.subheader(f'DXY is currently :red[higher] than the **{days}** average last days. :bear:')
 
-        st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
-                    use_container_width=True)   
+
+        tab1, tab2= st.tabs(["Chart", "Prediction"])
+
+        with tab1:
+
+            st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
+                        use_container_width=True)   
+
+
+        with tab2:
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
+            st.markdown("Note that the output can take time.")
+            
+
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                view = st.radio(
+                    ":blue[Select view] :chart_with_upwards_trend:",
+                    key="linear",
+                    options=["linear", "logarithmic"],
+                )
+
+            with c2:
+                time = st.radio(
+                    ":blue[Select timeframe] :hourglass_flowing_sand:",
+                    key="weekly",
+                    options=["daily", "weekly"],
+                )
+
+            if st.button('**Make Prediction**'):
+                #if view == "logarithmic":
+                #    st.write('**:red[Attention, logarithmic is not fitted for the diminishing returns]**')
+                #else: pass
+                dxy.reset_index(drop=False, inplace = True)
+                metr = dxy[['Date','Close']]
+
+                df_btc.reset_index(drop=False, inplace = True)
+                df = df_btc[['timestamp','Close']]
+                df.columns = ['ds','y']
+                metr.columns = ['ds','metric']
+                
+                df = df.merge(metr,left_on='ds',right_on='ds')
+
+                if view == "logarithmic":
+                    df['y']= np.log(df.y)
+                else: pass
+
+                if time == 'daily':
+                    pass
+                
+                elif time == 'weekly':
+                    df = df.iloc[::7]
+
+            
+                # Initialize Prophet model with regressor and fit to data
+
+                model = Prophet()
+
+                if time == 'daily':
+                    model.add_seasonality(name='4yearly', period=1461, fourier_order=10)
+                elif time == 'weekly':
+                    model.add_seasonality(name='4yearly', period=1461/7, fourier_order =8)
+
+
+                model.add_regressor('metric')
+                model.fit(df)
+
+
+                # Make predictions and plot the results
+                if time == 'daily':
+                    days = 90
+                    future_dates = model.make_future_dataframe(periods = days, freq='D')
+                    st.subheader(f':blue[Prediction at {days} days: ]')
+
+                elif time == 'weekly':
+                    weeks = 45
+                    future_dates = model.make_future_dataframe(periods = weeks, freq='W')
+                    st.subheader(f':blue[Prediction at {weeks} weeks: ]')
+
+
+                
+                future_dates['metric'] = df['metric']
+                
+
+                prediction = model.predict(future_dates.dropna())
+
+                fig = plot_plotly(model, prediction)
+
+                st.plotly_chart(go.Figure(fig))
+            
+                fig2 = plot_components_plotly(model, prediction)
+                
+                st.subheader(':blue[:Historical seasonalities detected by the model: ]')
+                st.plotly_chart(fig2)
+                
+
 
 elif categorie == 'Mining':
     if indicateur == 'Hashrate': 
@@ -882,7 +980,8 @@ elif categorie == 'Mining':
 
 
         with tab2:
-            st.subheader(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
 
 
@@ -1025,7 +1124,8 @@ elif categorie == 'Mining':
                         use_container_width=True)   
 
         with tab2:
-            st.subheader(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
 
 
@@ -1148,7 +1248,8 @@ elif categorie == 'Mining':
                                 use_container_width=True)   
 
         with tab2:
-            st.subheader(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on fbprophet]')
+            st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
 
 
