@@ -15,9 +15,9 @@ from datetime import datetime
 import requests
 import cryptocompare as cc
 from PIL import Image
-from fbprophet import Prophet
+from prophet import Prophet
 import matplotlib.pyplot as plt
-from fbprophet.plot import plot_plotly, plot_components_plotly
+from prophet.plot import plot_plotly, plot_components_plotly
 import plotly.graph_objs as go
 
 
