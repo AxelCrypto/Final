@@ -27,7 +27,7 @@ entrypoints
 ephem 
 executing 
 fastjsonschema==2.16.3
-fbprophet 
+fbprophet==0.7.1
 fonttools==4.25.0
 frozendict==2.3.5
 full-fred==0.0.9a3
