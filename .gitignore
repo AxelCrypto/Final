@@ -8,7 +8,6 @@ __pycache__/
 __pycache__
 #data
 #*.csv
-*.txt
 Learning-Bitcoin-from-the-Command-Line
 #Pipfile
 #Pipfile
