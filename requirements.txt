@@ -1,8 +1,0 @@
-pandas
-cryptocompare
-matplotlib
-pydeck
-streamlit
-flexidate
-fbprophet
-importlib-resources
