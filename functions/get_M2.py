@@ -6,14 +6,14 @@ import os
 
 def M2_usd():
     Path = os.path.dirname( os.path.abspath(__file__))
-    with open('functions/data/API Fred.txt') as api:
+    with open('functions/data/apis/API Fred.txt') as api:
         api = api.readlines()[0]
         
-    fred = Fred('functions/data/API Fred.txt')
+    fred = Fred('functions/data/apis/API Fred.txt')
 
     fred.get_api_key_file()
 
-    fred.set_api_key_file('functions/data/API Fred.txt')
+    fred.set_api_key_file('functions/data/apis/API Fred.txt')
 
     M2 = fred.get_series_df('WM2NS')
 

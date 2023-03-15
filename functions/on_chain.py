@@ -3,8 +3,11 @@ import requests
 import pandas as pd
 from functions.get_btc import btc
 import time
+import os
 
-with open('api.txt') as api:
+Path = os.path.dirname( os.path.abspath(__file__))
+
+with open(Path+'/data/apis/api.txt') as api:
     api = api.readlines()
 
 
@@ -71,10 +74,8 @@ def on_chain_merge(categorie, metric):
 
         except:
             df = on_chain_df(categorie, metric).copy()
-            time.sleep(4)
+            
             df['timestamp'] = pd.to_datetime(df['timestamp'])
-            #time.sleep(2)
-
             df.set_index('timestamp', drop = True, inplace = True)
             df_btc = btc().copy()
             df_btc.index = pd.to_datetime(df_btc.index)

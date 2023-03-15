@@ -36,7 +36,7 @@ st.set_page_config(
 )
 
 #Options download
-ind = pd.read_csv('data/free_indicators_glassnode.csv')
+ind = pd.read_csv('data/indicators_labels.csv')
 dic = ind[['category','metric']]
 categories = list(ind.category)
 categories.append('balances')
@@ -56,13 +56,6 @@ if categorie == 'Technique':
     with st.sidebar.form("Indicateurs"):
         indicateur = st.selectbox('Technical Indicators', ('Price', 'Price pattern', 'Bull-Market Support Bands', 'EHMA', 'Mayer Multiple', 'Puell Multiple'))
 
-        days_to_plot = st.slider(
-            'Number of days',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-
         checkbox_val = st.checkbox("Logarithmic")
 
         # Every form must have a submit button.
@@ -71,12 +64,6 @@ if categorie == 'Technique':
 elif categorie == 'Macro':
     with st.sidebar.form("Macro"):
         indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
-        days_to_plot = st.slider(
-            'Number of days',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-            )
 
         checkbox_val = st.checkbox("Logarithmic")
         checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
@@ -90,12 +77,6 @@ elif categorie == 'Macro':
 elif categorie == 'Mining':
     with st.sidebar.form("Mining"):
         indicateur = st.selectbox('Mining Indicators', ('Hashrate', 'Total Transaction Fees (BTC)','volume_sum'))
-        days_to_plot = st.slider(
-            'Number of days',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-            )
 
         checkbox_val = st.checkbox("Logarithmic")
         checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
@@ -128,13 +109,6 @@ else:
         elif onchain == 'institutions':
             metrics = st.selectbox("**metrics**", ('purpose_etf_holdings_sum','purpose_etf_flows_sum','purpose_etf_aum_sum'))
 
-        days_to_plot = st.slider(
-        'Number of days',
-        min_value=1,
-        max_value=len(df_btc),
-        value=len(df_btc)
-        )
-
         checkbox_val = st.checkbox("Logarithmic")
         checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
         ma = st.slider("Indicator MA", min_value=1, max_value=90, value=1)
@@ -161,6 +135,12 @@ if categorie == 'Technique':
         st.header('Bitcoin `Actual price`')
         st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
         df = df_btc.copy()
+        days_to_plot = st.slider(
+            'Days to plot',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
         df = df[-days_to_plot:]
         
 
@@ -347,7 +327,7 @@ if categorie == 'Technique':
         df = df_btc.copy()
         df['20w_sma'] = df['Close'].rolling(140).mean()
         df['21w_ema'] = df['Close'].ewm(span=21, adjust=False).mean()
-        df = df[-days_to_plot:]
+
 
         col1, col2, col3 = st.columns(3)
         col1.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
@@ -362,6 +342,14 @@ if categorie == 'Technique':
 
             else :
                 st.subheader('We are currently in a :red[bearmarket] :bear:')
+
+        days_to_plot = st.slider(
+            'Number of days',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        df = df[-days_to_plot:]
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -455,7 +443,6 @@ if categorie == 'Technique':
         st.header('Bitcoin `EHMA`')
 
         df = df_btc.copy()
-        df = df[-days_to_plot:]
 
         # Add EHMA indicator
         period = 180
@@ -484,6 +471,15 @@ if categorie == 'Technique':
 
             else :
                 st.subheader('We are currently in a :red[bearmarket] :bear:')
+
+        days_to_plot = st.slider(
+            'Days to plot',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        df = df[-days_to_plot:]
+
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -585,7 +581,6 @@ if categorie == 'Technique':
         df = df_btc.copy()
         df['200d_ma'] = df['Close'].rolling(200).mean()
         df['metric'] = df['Close'] / df['200d_ma']
-        df = df[-days_to_plot:]
 
 
         col1, col2 = st.columns(2)
@@ -604,6 +599,16 @@ if categorie == 'Technique':
 
             else :
                 st.subheader('Probably an :green[opportunity] :crossed_flags:')
+
+
+        days_to_plot = st.slider(
+            'Days to plot',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        df = df[-days_to_plot:]
+
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -695,7 +700,6 @@ if categorie == 'Technique':
         df = df_btc.copy()
         df['365d_ma'] = df['Close'].rolling(365).mean()
         df['metric'] = df['Close'] / df['365d_ma']
-        df = df[-days_to_plot:]
 
 
         col1, col2 = st.columns(2)
@@ -714,6 +718,15 @@ if categorie == 'Technique':
 
             else :
                 st.subheader('Probably an :green[opportunity] :crossed_flags:')
+
+        days_to_plot = st.slider(
+            'Days to plot',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        df = df[-days_to_plot:]
+
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -814,6 +827,8 @@ elif categorie == 'Macro':
         df = merging(df_usd,df_eur, df_btc)
         df ['M2_sum'] = df.m2_usd + df.m2_eur
 
+
+
         days = st.number_input(
             'Number of days to compare',
             min_value=31,
@@ -829,6 +844,16 @@ elif categorie == 'Macro':
 
             else :
                 st.subheader('We are currently  in a :red[tightning] :bear:')
+
+        days_to_plot = st.slider(
+            'Days to plot',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        df = df[-days_to_plot:]
+
+
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -965,6 +990,7 @@ elif categorie == 'Macro':
             step=1
         )
 
+
         if st.button('**Evaluate the current situation**'):
 
             
@@ -976,6 +1002,21 @@ elif categorie == 'Macro':
             else :
                 st.subheader(f'DXY is currently :red[higher] than the **{days}** average last days. :bear:')
 
+        days_to_plot = st.slider(
+            'Days to plot dxy',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        days_to_plot_btc = st.slider(
+            'Days to plot btc',
+            min_value=1,
+            max_value=len(df_btc),
+            value=len(df_btc)
+        )
+        dxy = dxy[-days_to_plot:]
+        df_btc = df_btc[-days_to_plot_btc:]
+        
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -1101,7 +1142,7 @@ elif categorie == 'Mining':
             df.to_csv(f'data/datos/{categorie}_{indicateur}.csv')
         
         st.header(f'You are looking at `{indicateur}` from the category `{categorie}`')
-        df = df[-days_to_plot:]
+
         
 
         st.write('The hashrate is the computing power miners use to secure the Bitcoin network. \n\n'
@@ -1131,9 +1172,22 @@ elif categorie == 'Mining':
             else :
                 st.subheader(f"Hashrate is currently :red[lower] than the **{days}** last days' average. :bear:")
 
+
+
+
+
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+            
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
+
             st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, indicateur,checkbox_zscore ),
                                 use_container_width=True)   
 
@@ -1253,7 +1307,6 @@ elif categorie == 'Mining':
             df.to_csv(f'data/datos/{categorie}_{indicateur}.csv')
         
         st.header(f'You are looking at `{indicateur}` from the category `{categorie}`')
-        df = df[-days_to_plot:]
     
         st.write('The total BTC value of all transaction fees paid to miners. \n\n'
                     "Decrease = :red[less] demand :man_with_probing_cane: \n\n"
@@ -1283,7 +1336,13 @@ elif categorie == 'Mining':
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
-
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df),
+                value=len(df)
+            )
+            df = df[-days_to_plot:]
             st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, indicateur,checkbox_zscore ),
                         use_container_width=True)   
 
@@ -1407,6 +1466,14 @@ elif categorie == 'Mining':
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df),
+                value=len(df)
+            )
+            df = df[-days_to_plot:]
 
             st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, 'fees', indicateur, checkbox_zscore ),
                                 use_container_width=True)   
@@ -1538,11 +1605,6 @@ elif categorie == 'On-Chain':
             df.to_csv('data/datos/merged_balances.csv')
 
 
-        df = df[-days_to_plot:]
-
-
-
-
         if type_balance == 'Adresses Count':
             st.header(f'You are looking at `{type_balance}` from the category `{onchain}`')
             st.write('You are looking at the number of adresses per cohort. \n\n'
@@ -1555,6 +1617,13 @@ elif categorie == 'On-Chain':
 
             with tab1:
 
+                days_to_plot = st.slider(
+                    'Days to plot',
+                    min_value=1,
+                    max_value=len(df),
+                    value=len(df)
+                )
+                df = df[-days_to_plot:]
 
                 st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma,type_balance, metrics, checkbox_zscore),
                     use_container_width=True)     
@@ -1670,7 +1739,13 @@ elif categorie == 'On-Chain':
             tab1, tab2= st.tabs(["Chart", "Prediction"])
 
             with tab1:
-
+                days_to_plot = st.slider(
+                    'Days to plot',
+                    min_value=1,
+                    max_value=len(df),
+                    value=len(df)
+                )
+                df = df[-days_to_plot:]
 
                 st.plotly_chart(balances_viz_addresses(df, checkbox_val, checkbox_val_metric, ma, type_balance,metrics, checkbox_zscore),
                     use_container_width=True)    
@@ -1791,9 +1866,7 @@ elif categorie == 'On-Chain':
         st.header(f'You are looking at `{metrics}` from the category `{categorie}`')
 
         st.write('Total number of unique addresses used on the blockchain. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
-
-        df = df[-days_to_plot:]
-        
+       
         
         days = st.number_input(
             'Number of days to compare',
@@ -1816,7 +1889,13 @@ elif categorie == 'On-Chain':
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
-
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df),
+                value=len(df)
+            )
+            df = df[-days_to_plot:]
             st.plotly_chart(viz_with_indicator(df, checkbox_val, checkbox_val_metric, ma, metrics,checkbox_zscore ),
                             use_container_width=True)   
 
@@ -1904,7 +1983,6 @@ elif categorie == 'On-Chain':
     else:
         df = on_chain_merge(onchain, metrics)
         st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
-        df = df[-days_to_plot:]
 
         days = st.number_input(
             'Number of days to compare',
@@ -1927,7 +2005,13 @@ elif categorie == 'On-Chain':
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
-
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df),
+                value=len(df)
+            )
+            df = df[-days_to_plot:]
 
             st.plotly_chart(on_chain_viz_zscore(df, checkbox_val, checkbox_val_metric, ma, onchain, metrics,checkbox_zscore ),
                             use_container_width=True)   

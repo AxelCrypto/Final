@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 
 Path = os.path.dirname( os.path.abspath(__file__))
 
-with open(Path+'/../api_cryptocompare.txt') as api:
+with open(Path+'/../functions/data/apis/api_cryptocompare.txt') as api:
     api = api.readlines()[0]
 
 api_key = api
