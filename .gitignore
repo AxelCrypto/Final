@@ -15,6 +15,7 @@ Pipfile
 .log
 Pipfile.lock
 main_test.py
+4.2.0
 
 
 

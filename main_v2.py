@@ -4,7 +4,7 @@ import streamlit as st
 from functions.candlestick_v2 import *
 from functions.get_btc import btc
 import numpy as np
-from get_merge_btc_M2s import *
+from functions.get_merge_btc_M2s import *
 from functions.patterns import *
 from functions.on_chain import *
 from functions.on_chain_viz import *
@@ -54,10 +54,10 @@ categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Minin
 if categorie == 'Technique':
 
     with st.sidebar.form("Indicateurs"):
-        indicateur = st.selectbox('Indicateurs techniques ', ('Price', 'Price pattern', 'Bull-Market Support Bands', 'EHMA', 'Mayer Multiple', 'Puell Multiple'))
+        indicateur = st.selectbox('Technical Indicators', ('Price', 'Price pattern', 'Bull-Market Support Bands', 'EHMA', 'Mayer Multiple', 'Puell Multiple'))
 
         days_to_plot = st.slider(
-            'Nombre de jours',
+            'Number of days',
             min_value=1,
             max_value=len(df_btc),
             value=len(df_btc)
@@ -72,7 +72,7 @@ elif categorie == 'Macro':
     with st.sidebar.form("Macro"):
         indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
         days_to_plot = st.slider(
-            'Nombre de jours',
+            'Number of days',
             min_value=1,
             max_value=len(df_btc),
             value=len(df_btc)
@@ -91,7 +91,7 @@ elif categorie == 'Mining':
     with st.sidebar.form("Mining"):
         indicateur = st.selectbox('Mining Indicators', ('Hashrate', 'Total Transaction Fees (BTC)','volume_sum'))
         days_to_plot = st.slider(
-            'Nombre de jours',
+            'Number of days',
             min_value=1,
             max_value=len(df_btc),
             value=len(df_btc)
@@ -129,7 +129,7 @@ else:
             metrics = st.selectbox("**metrics**", ('purpose_etf_holdings_sum','purpose_etf_flows_sum','purpose_etf_aum_sum'))
 
         days_to_plot = st.slider(
-        'Nombre de jours',
+        'Number of days',
         min_value=1,
         max_value=len(df_btc),
         value=len(df_btc)
@@ -137,7 +137,7 @@ else:
 
         checkbox_val = st.checkbox("Logarithmic")
         checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
-        ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
+        ma = st.slider("Indicator MA", min_value=1, max_value=90, value=1)
 
         checkbox_zscore = st.checkbox("Activer le Z-Score")
 
@@ -166,11 +166,13 @@ if categorie == 'Technique':
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
+        #display chart:
         with tab1:
 
             st.plotly_chart(get_candlestick_plot(df, checkbox_val, 'btc'),
                 use_container_width=True)    
-           
+
+        #display fbprophet:
         with tab2:
             st.title(':blue[Prediction based on fbprophet]')
             st.subheader('Based on historical price only')
@@ -224,13 +226,8 @@ if categorie == 'Technique':
                 elif time == 'monthly':
                     model.add_seasonality(name='4yearly', period=1461/7/12, fourier_order =4)
 
-
-
-
-
                 model.fit(df)
                 
-
                 if time == 'daily':
                     days = 60
                     future_dates = model.make_future_dataframe(periods = days, freq='D')
@@ -264,159 +261,99 @@ if categorie == 'Technique':
 
         st.subheader('Current pricing canals :chart_with_upwards_trend: :chart_with_downwards_trend:')      
            
-        c1, c2 = st.columns(2)
-        with c1:
-            df = df_btc.copy()
-            df.reset_index(drop=False, inplace=True)
-            df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
-            df.Date = pd.to_datetime(df.Date)
+        days_1 = st.slider(
+        'Pattern days',
+        min_value=4,
+        max_value=500,
+        value=95
+    )
+        total_1 = st.slider(
+        'Total Frame',
+        min_value=1,
+        max_value=len(df_btc),
+        value=365
+    )   
 
+        df = df_btc.copy()
+        df.reset_index(drop=False, inplace=True)
+        df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
+        df.Date = pd.to_datetime(df.Date)
 
-            one_year = 300
+        one_year = total_1
 
-            # Filter the dates to plot only the region of interest
-            df = df[(df['Date'] > max(df['Date']) - one_year * pd.offsets.Day())]
-            df = df.reset_index(drop=True)
+        # Filter the dates to plot only the region of interest
+        df = df[(df['Date'] > max(df['Date']) - one_year * pd.offsets.Day())]
+        df = df.reset_index(drop=True)
 
-            frame = 45
+        frame = days_1
 
-            # Get another df of the dates where we draw the support/resistance lines
-            df_trend = df[(df.loc[:, 'Date'] > max(df['Date']) - frame * pd.offsets.Day()) & (df.loc[:, 'Date'] < max(df.loc[:, 'Date']))]
+        # Get another df of the dates where we draw the support/resistance lines
+        df_trend = df[(df.loc[:, 'Date'] > max(df['Date']) - frame * pd.offsets.Day()) & (df.loc[:, 'Date'] < max(df.loc[:, 'Date']))]
 
-            # Apply the smoothing algorithm and get the gradient/intercept terms
-            m_res, c_res = find_grad_intercept(case='resistance', 
-                x=df_trend.index.values, 
-                y=heat_eqn_smooth(df_trend['High'].values.copy()),
-            )
-            m_supp, c_supp = find_grad_intercept(
-                case='support', 
-                x=df_trend.index.values, 
-                y=heat_eqn_smooth(df_trend['Low'].values.copy()),
-            )
+        # Apply the smoothing algorithm and get the gradient/intercept terms
+        m_res, c_res = find_grad_intercept(case='resistance', 
+            x=df_trend.index.values, 
+            y=heat_eqn_smooth(df_trend['High'].values.copy()),
+        )
+        m_supp, c_supp = find_grad_intercept(
+            case='support', 
+            x=df_trend.index.values, 
+            y=heat_eqn_smooth(df_trend['Low'].values.copy()),
+        )
 
-            # Get the plotly figure
-            layout = go.Layout(
-                title=f'Price patterns of the last {frame} days',
-                xaxis={'title': 'Date'},
-                yaxis={'title': 'Price'},
-                legend={'x': 0, 'y': 1.075, 'orientation': 'h'},
-                width=600,
-                height=500,
-            ) 
+        # Get the plotly figure
+        layout = go.Layout(
+            title=f'Price patterns of the last {frame} days',
+            xaxis={'title': 'Date'},
+            yaxis={'title': 'Price'},
+            legend={'x': 0, 'y': 1.075, 'orientation': 'h'},
+            width=500,
+            height=700,
+        ) 
 
-            fig = go.Figure(
-                layout=layout,
-                data=[
-                    go.Candlestick(
-                        x=df['Date'],
-                        open=df['Open'], 
-                        high=df['High'],
-                        low=df['Low'],
-                        close=df['Close'],
-                        showlegend=False,
-                    ),
-                    go.Line(
-                        x=df_trend['Date'], 
-                        y=m_res*df_trend.index + c_res, 
-                        showlegend=False, 
-                        line={'color': 'rgba(89, 105, 208, 1)'}, 
-                        mode='lines',
-                    ),
-                    go.Line(
-                        x=df_trend['Date'], 
-                        y=m_supp*df_trend.index + c_supp, 
-                        showlegend=False, 
-                        line={'color': 'rgba(89, 105, 208, 1)'}, 
-                        mode='lines',
-                    ),
-                ]
-            )
+        fig = go.Figure(
+            layout=layout,
+            data=[
+                go.Candlestick(
+                    x=df['Date'],
+                    open=df['Open'], 
+                    high=df['High'],
+                    low=df['Low'],
+                    close=df['Close'],
+                    showlegend=False,
+                ),
+                go.Line(
+                    x=df_trend['Date'], 
+                    y=m_res*df_trend.index + c_res, 
+                    showlegend=False, 
+                    line={'color': 'rgba(89, 105, 208, 1)'}, 
+                    mode='lines',
+                ),
+                go.Line(
+                    x=df_trend['Date'], 
+                    y=m_supp*df_trend.index + c_supp, 
+                    showlegend=False, 
+                    line={'color': 'rgba(89, 105, 208, 1)'}, 
+                    mode='lines',
+                ),
+            ]
+        )
 
-            st.plotly_chart(fig, use_container_width=False)
-
-        with c2:
-            #df.reset_index(drop=True, inplace=True)
-            #df.columns = ['Date', 'Close', 'High', 'Low', 'Open', 'Volume']
-
-            one_year = 300
-
-            # Filter the dates to plot only the region of interest
-            df = df[(df['Date'] > max(df['Date']) - one_year * pd.offsets.Day())]
-            df = df.reset_index(drop=True)
-
-            frame = 250
-
-            # Get another df of the dates where we draw the support/resistance lines
-            df_trend = df[(df.loc[:, 'Date'] > max(df['Date']) - frame * pd.offsets.Day()) & (df.loc[:, 'Date'] < max(df.loc[:, 'Date']))]
-
-            # Apply the smoothing algorithm and get the gradient/intercept terms
-            m_res, c_res = find_grad_intercept(case = 'resistance', 
-                x = df_trend.index.values, 
-                y = heat_eqn_smooth(df_trend['High'].values.copy()),
-            )
-            m_supp, c_supp = find_grad_intercept(
-                case = 'support', 
-                x = df_trend.index.values, 
-                y = heat_eqn_smooth(df_trend['Low'].values.copy()),
-            )
-            
-            # Get the plotly figure
-            layout = go.Layout(
-                title = f'Price pattern of the last {frame} days',
-                xaxis = {'title': 'Date'},
-                yaxis = {'title': 'Price'},
-                legend = {'x': 0, 'y': 1.075, 'orientation': 'h'},
-                width = 600,
-                height = 500,
-            ) 
-
-            fig = go.Figure(
-                layout=layout,
-                data=[
-                    go.Candlestick(
-                        x = df['Date'],
-                        open = df['Open'], 
-                        high = df['High'],
-                        low = df['Low'],
-                        close = df['Close'],
-                        showlegend = False,
-                    ),
-                    go.Line(
-                        x = df_trend['Date'], 
-                        y = m_res*df_trend.index + c_res, 
-                        showlegend = False, 
-                        line = {'color': 'rgba(89, 105, 208, 1)'}, 
-                        mode = 'lines',
-                    ),
-                    go.Line(
-                        x = df_trend['Date'], 
-                        y = m_supp*df_trend.index + c_supp, 
-                        showlegend = False, 
-                        line = {'color': 'rgba(89, 105, 208, 1)'}, 
-                        mode = 'lines',
-                    ),
-                ]
-            )
-            
-
-            st.plotly_chart(fig ,use_container_width=False)
+        st.plotly_chart(fig, use_container_width=True)
 
     elif indicateur == 'Bull-Market Support Bands': 
         st.header('Bitcoin `Bull-Market Support Bands`')
-
 
         df = df_btc.copy()
         df['20w_sma'] = df['Close'].rolling(140).mean()
         df['21w_ema'] = df['Close'].ewm(span=21, adjust=False).mean()
         df = df[-days_to_plot:]
 
-
         col1, col2, col3 = st.columns(3)
         col1.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
         col2.metric("Last  price 21w EMA", round(df['21w_ema'][-1],0), round((df['21w_ema'][-1]/df['21w_ema'][-2] - 1)*100,2))
         col3.metric("Last  price 20w SMA", round(df['20w_sma'][-1],0), round((df['20w_sma'][-1]/df['20w_sma'][-2] - 1)*100,2))
         st.write('Bull-Market Support bands are a good support during :green[bullmarkets] and a strong resistence during :red[bearmarkets]')
-
 
         if st.button('**Evaluate the current situation**'):
 
@@ -425,11 +362,6 @@ if categorie == 'Technique':
 
             else :
                 st.subheader('We are currently in a :red[bearmarket] :bear:')
-
-
-
-        # Determine the y-axis type
-        
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
@@ -443,8 +375,7 @@ if categorie == 'Technique':
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
             
-
-            
+ 
             c1, c2 = st.columns(2)
             with c1:
                 view = st.radio(
