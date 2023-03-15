@@ -10,10 +10,10 @@ __pycache__
 #*.csv
 *.txt
 Learning-Bitcoin-from-the-Command-Line
-Pipfile
-Pipfile
+#Pipfile
+#Pipfile
 .log
-Pipfile.lock
+#Pipfile.lock
 main_test.py
 4.2.0
 
