@@ -1,11 +1,8 @@
+pandas
+cryptocompare
 matplotlib
-pyparsing>=2.2.1
-fonttools>=4.22.0
-cycler>=0.10
-kiwisolver>=1.0.1
-packaging>=20.0
-numpy>=1.17
-python-dateutil>=2.7
-pillow>=6.2.0
-six>=1.5
+pydeck
+streamlit
+flexidate
+fbprophet
 importlib_resources
