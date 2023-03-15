@@ -5,4 +5,4 @@ pydeck
 streamlit
 flexidate
 fbprophet
-importlib_resources
+importlib-resources
