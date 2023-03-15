@@ -27,6 +27,7 @@ entrypoints
 ephem 
 executing 
 fastjsonschema==2.16.3
+pystan==2.16.0.0
 fbprophet==0.7.1
 fonttools==4.25.0
 frozendict==2.3.5
@@ -84,7 +85,6 @@ PyMeeus
 Pympler==1.0.1
 pyparsing 
 pyrsistent==0.19.3
-pystan==2.16.0.0
 python-dateutil 
 pytz 
 pytz-deprecation-shim==0.1.0.post0
