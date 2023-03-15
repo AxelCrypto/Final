@@ -1,0 +1,15 @@
+,Unnamed: 0.1,Unnamed: 0,path,metric,category
+3,3,3,/v1/metrics/addresses/active_count,active_count,addresses
+4,4,4,/v1/metrics/addresses/new_non_zero_count,new_non_zero_count,addresses
+8,8,8,/v1/metrics/transactions/count,count,transactions
+10,10,10,/v1/metrics/transactions/size_mean,size_mean,transactions
+13,13,13,/v1/metrics/transactions/transfers_volume_mean,transfers_volume_mean,transactions
+19,19,19,/v1/metrics/indicators/sopr,sopr,indicators
+20,20,20,/v1/metrics/indicators/stock_to_flow_ratio,stock_to_flow_ratio,indicators
+21,21,21,/v1/metrics/indicators/pi_cycle_top,pi_cycle_top,indicators
+38,38,38,/v1/metrics/supply/active_more_1y_percent,active_more_1y_percent,supply
+42,42,42,/v1/metrics/market/price_drawdown_relative,price_drawdown_relative,market
+43,43,43,/v1/metrics/market/marketcap_usd,marketcap_usd,market
+45,45,45,/v1/metrics/institutions/purpose_etf_holdings_sum,purpose_etf_holdings_sum,institutions
+46,46,46,/v1/metrics/institutions/purpose_etf_flows_sum,purpose_etf_flows_sum,institutions
+47,47,47,/v1/metrics/institutions/purpose_etf_aum_sum,purpose_etf_aum_sum,institutions

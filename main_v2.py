@@ -45,8 +45,9 @@ categories.append('balances')
 ## Sidebar options
 
 # titre sidebar
-st.sidebar.header('Dashboard')
+#st.image('images/logo.png', width = 150, clamp =255)
 
+st.sidebar.header(':blue[**DASHBOARD**]')
 
 #st.sidebar.subheader('Données')
 categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Mining', 'On-Chain'))

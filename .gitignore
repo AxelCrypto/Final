@@ -6,8 +6,8 @@ __pycache__/
 .ipynb_checkpoints
 .vscode
 __pycache__
-data
-*.csv
+#data
+#*.csv
 *.txt
 Learning-Bitcoin-from-the-Command-Line
 Pipfile
