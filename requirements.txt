@@ -84,7 +84,7 @@ PyMeeus
 Pympler==1.0.1
 pyparsing 
 pyrsistent==0.19.3
-pystan==2.19.1.1
+pystan==2.18.0.0
 python-dateutil 
 pytz 
 pytz-deprecation-shim==0.1.0.post0
