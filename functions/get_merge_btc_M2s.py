@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+import pylab as plt
 import pandas as pd
 import sys
 from functions.get_btc import btc
