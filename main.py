@@ -1443,7 +1443,6 @@ elif categorie == 'Mining':
     elif indicateur == 'volume_sum': 
         df = on_chain_merge('fees', indicateur)
         st.header(f'You are looking at `{indicateur}` from the category `mining`')
-        df = df[-days_to_plot:]
         st.write('The total amount of fees paid to miners. Inflation rewards not included. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
 
 
