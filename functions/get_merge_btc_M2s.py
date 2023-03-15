@@ -1,9 +1,5 @@
 import time
 from datetime import datetime
-#import pylab as plt
-try:
-    import matplotlib.pyplot as plt
-except: %pip install matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
