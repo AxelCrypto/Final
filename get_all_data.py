@@ -12,6 +12,7 @@ from functions.on_chain import *
 from functions.balances import *
 from git import Repo
 import os
+import time
 
 
 Path = os.path.dirname( os.path.abspath(__file__))
@@ -190,6 +191,7 @@ def run_all():
     get_all_data_onchain('indicators', 'sopr')
     get_all_data_onchain('institutions', 'purpose_etf_aum_sum')
     get_all_data_onchain('institutions', 'purpose_etf_flows_sum')
+    time.sleep(60)
     get_all_data_onchain('institutions', 'purpose_etf_holdings_sum')
     get_all_data_onchain('market', 'marketcap_usd')
     get_all_data_onchain('market', 'marketcap_usd')
