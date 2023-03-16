@@ -344,17 +344,19 @@ if categorie == 'Technical':
             else :
                 st.subheader('We are currently in a :red[bearmarket] :bear:')
 
-        days_to_plot = st.slider(
-            'Number of days',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        df = df[-days_to_plot:]
+
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
+
         with tab1:
+            days_to_plot = st.slider(
+                'Number of days',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
             st.plotly_chart(get_candlestick_plot_ma(df, checkbox_val, 'btc' ),
                 use_container_width=True)   
 
@@ -473,18 +475,19 @@ if categorie == 'Technical':
             else :
                 st.subheader('We are currently in a :red[bearmarket] :bear:')
 
-        days_to_plot = st.slider(
-            'Days to plot',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        df = df[-days_to_plot:]
+
 
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
             # Determine the y-axis type
             if checkbox_val == True:
                 st.plotly_chart(
@@ -602,18 +605,18 @@ if categorie == 'Technical':
                 st.subheader('Probably an :green[opportunity] :crossed_flags:')
 
 
-        days_to_plot = st.slider(
-            'Days to plot',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        df = df[-days_to_plot:]
 
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
             st.plotly_chart(viz_with_indicator(df, checkbox_val, True, 1, indicateur, False),
                     use_container_width=True)     
 
