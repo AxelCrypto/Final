@@ -136,20 +136,20 @@ if categorie == 'Technical':
         st.header('Bitcoin `Actual price`')
         st.metric("Last  price", f'${df_btc.iloc[-1,0]}', f'{round((df_btc.iloc[-1,0]/df_btc.iloc[-2,0]-1 ) *100,2)}%')
         df = df_btc.copy()
-        days_to_plot = st.slider(
-            'Days to plot',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        df = df[-days_to_plot:]
-        
+
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         #display chart:
         with tab1:
-
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
+        
             st.plotly_chart(get_candlestick_plot(df, checkbox_val, 'btc'),
                 use_container_width=True)    
 
@@ -723,18 +723,20 @@ if categorie == 'Technical':
             else :
                 st.subheader('Probably an :green[opportunity] :crossed_flags:')
 
-        days_to_plot = st.slider(
-            'Days to plot',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        df = df[-days_to_plot:]
+
 
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
+
             st.plotly_chart(viz_with_indicator(df, checkbox_val, True, 1, indicateur, False),
                     use_container_width=True)     
             
@@ -849,19 +851,20 @@ elif categorie == 'Macro':
             else :
                 st.subheader('We are currently  in a :red[tightning] :bear:')
 
-        days_to_plot = st.slider(
-            'Days to plot',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        df = df[-days_to_plot:]
 
 
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+            days_to_plot = st.slider(
+                'Days to plot',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            df = df[-days_to_plot:]
+
 
             st.plotly_chart(macro_zscore(df, checkbox_val, checkbox_val_metric, ma, 
                                         #checkbox_zscore, 
@@ -1006,26 +1009,28 @@ elif categorie == 'Macro':
             else :
                 st.subheader(f'DXY is currently :red[higher] than the **{days}** average last days. :bear:')
 
-        days_to_plot = st.slider(
-            'Days to plot dxy',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        days_to_plot_btc = st.slider(
-            'Days to plot btc',
-            min_value=1,
-            max_value=len(df_btc),
-            value=len(df_btc)
-        )
-        dxy = dxy[-days_to_plot:]
-        df_btc = df_btc[-days_to_plot_btc:]
+
         
 
         tab1, tab2= st.tabs(["Chart", "Prediction"])
 
         with tab1:
+            days_to_plot = st.slider(
+                'Days to plot dxy',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            days_to_plot_btc = st.slider(
+                'Days to plot btc',
+                min_value=1,
+                max_value=len(df_btc),
+                value=len(df_btc)
+            )
+            dxy = dxy[-days_to_plot:]
+            df_btc = df_btc[-days_to_plot_btc:]
 
+            
             st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
                         use_container_width=True)   
 
