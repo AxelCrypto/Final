@@ -34,7 +34,7 @@ Bitcoin's price is mostly influenced by the following factors:
 - For each indicator, you can click on "evaluate the current situation" and a tendency analysis will appear.   
     - This is only a personal insight and can't be trusted for any financial decision.   
 
-![ev](images/ev.png)
+<kbd> <img src="images/ev.png" /> </kbd>
 
 
 - For each indicator or Bitcoin's price only, you can visualize what the machine learning can predict for the coming days or weeks.  
@@ -42,7 +42,7 @@ Bitcoin's price is mostly influenced by the following factors:
     - The model is going to use the past prices and add a regressor based on the potential indicator.  
     - This is experimental and can't be trusted for any financial decision.  
 
-![prophet](images/prophet.png)
+<kbd> <img src="images/prophet.png" /> </kbd>
 
 
 ### Connect with me 🫡  
