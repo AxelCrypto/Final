@@ -11,7 +11,6 @@ Bitcoin's price is mostly influenced by the following factors:
 
 
 #### Those are the four categories of indicators available: 
-|![categories](images/categories.png)|
 <kbd> <img src="images/categories.png" /> </kbd>
 
 
@@ -22,11 +21,12 @@ Bitcoin's price is mostly influenced by the following factors:
     - with possibilities of logarithmic or linear both for BTC's price and indicator.
     - smooth the indicator's line with a moving average 
  
-![macategories](images/ma.png)
+<kbd> <img src="images/ma.png" /> </kbd>
+
 
 - Z-score visualization is a standard deviation visualization of the metric. Very helpful to visualize the tendencies.   
 
-![zscore](images/zscore.png)
+<kbd> <img src="images/zscore.png" /> </kbd>
 
 
 ## Evaluation of Tendencies 📈
