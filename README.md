@@ -46,5 +46,5 @@ Bitcoin's price is mostly influenced by the following factors:
 
 
 ### Connect with me 🫡  
-[twitter] (https://twitter.com/AxelCryptoytb)
+[twitter] (https://twitter.com/AxelCryptoytb)   
 [linkedin] (https://www.linkedin.com/in/axel-girou-garcia/)
