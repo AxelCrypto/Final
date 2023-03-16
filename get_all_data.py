@@ -197,8 +197,7 @@ def run_all():
     get_all_data_onchain('transactions', 'count')
     get_all_data_onchain('transactions', 'size_mean')
 
-#run_all()
-get_all_data_blockchain('Mining', 'Total Transaction Fees (BTC)')
+run_all()
 
 PATH_OF_GIT_REPO = r'.git'  
 COMMIT_MESSAGE = 'update_data'
