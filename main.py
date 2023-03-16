@@ -126,6 +126,7 @@ By **[Axel](https://twitter.com/AxelCryptoytb)**
 *Data should NOT be used for trading and investing.*
 ''')
 
+st.sidebar.markdown('Last Update: 16/03/2023')
 
 
 # Charts selon la selection:
