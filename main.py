@@ -50,9 +50,9 @@ categories.append('balances')
 st.sidebar.header(':blue[**DASHBOARD**]')
 
 #st.sidebar.subheader('Données')
-categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Mining', 'On-Chain'))
+categorie = st.sidebar.selectbox("**categories**", ('Technical', 'Macro', 'Mining', 'On-Chain'))
 
-if categorie == 'Technique':
+if categorie == 'Technical':
 
     with st.sidebar.form("Indicators"):
         indicateur = st.selectbox('Technical Indicators', ('Price', 'Price pattern', 'Bull-Market Support Bands', 'EHMA', 'Mayer Multiple', 'Puell Multiple'))
@@ -60,32 +60,32 @@ if categorie == 'Technique':
         checkbox_val = st.checkbox("Logarithmic")
 
         # Every form must have a submit button.
-        submitted = st.form_submit_button("**Envoyer**")
+        submitted = st.form_submit_button("**Send**")
  
 elif categorie == 'Macro':
     with st.sidebar.form("Macro"):
-        indicateur = st.selectbox('Indicateurs macro-économiques', ('Masse Monétaire', 'DXY'))
+        indicateur = st.selectbox('Macro Indicators', ('Money Supply', 'DXY'))
 
         checkbox_val = st.checkbox("Logarithmic")
-        checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
-        ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
+        checkbox_val_metric = st.checkbox("Logarithmic Indicators")
+        ma = st.slider("Indicator's MA", min_value=1, max_value=90, value=1)
 
         #checkbox_zscore = st.checkbox("Activer le Z-Score")
 
         # Every form must have a submit button.
-        submitted = st.form_submit_button("**Envoyer**")
+        submitted = st.form_submit_button("**Send**")
 
 elif categorie == 'Mining':
     with st.sidebar.form("Mining"):
         indicateur = st.selectbox('Mining Indicators', ('Hashrate', 'Total Transaction Fees (BTC)','volume_sum'))
 
         checkbox_val = st.checkbox("Logarithmic")
-        checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
-        ma = st.slider("Moyenne de l'indicateur", min_value=1, max_value=90, value=1)
+        checkbox_val_metric = st.checkbox("Logarithmic Indicator")
+        ma = st.slider("Indicator's MA", min_value=1, max_value=90, value=1)
 
-        checkbox_zscore = st.checkbox("Activer le Z-Score")
+        checkbox_zscore = st.checkbox("Activate Z-Score")
 
-        submitted = st.form_submit_button("**Envoyer**")
+        submitted = st.form_submit_button("**Send**")
 
 else:
     onchain = st.sidebar.selectbox('**Type**', (sorted(set(categories))))
@@ -111,13 +111,13 @@ else:
             metrics = st.selectbox("**metrics**", ('purpose_etf_holdings_sum','purpose_etf_flows_sum','purpose_etf_aum_sum'))
 
         checkbox_val = st.checkbox("Logarithmic")
-        checkbox_val_metric = st.checkbox("Indicateur Logarithmic")
-        ma = st.slider("Indicator MA", min_value=1, max_value=90, value=1)
+        checkbox_val_metric = st.checkbox("Logarithmic Indicator")
+        ma = st.slider("Indicator's MA", min_value=1, max_value=90, value=1)
 
-        checkbox_zscore = st.checkbox("Activer le Z-Score")
+        checkbox_zscore = st.checkbox("Activate Z-Score")
 
         # Every form must have a submit button.
-        submitted = st.form_submit_button("**Envoyer**")
+        submitted = st.form_submit_button("**Send**")
 
 st.sidebar.markdown('''
 ---
@@ -130,7 +130,7 @@ Data should NOT be used for trading and investing.
 
 # Charts selon la selection:
 
-if categorie == 'Technique':
+if categorie == 'Technical':
     if indicateur == 'Price': 
         st.title(":green[GM Satoshi] 🕵️, Welcome to the *Bitcoin's Price Rabbit hole!*")
         st.header('Bitcoin `Actual price`')
@@ -815,7 +815,7 @@ if categorie == 'Technique':
                 
 
 elif categorie == 'Macro':
-    if indicateur == 'Masse Monétaire': 
+    if indicateur == 'Money Supply': 
 
         st.header('Bitcoin vs `money printing (ECB+FED)` :money_with_wings:')
 
