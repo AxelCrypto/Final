@@ -155,7 +155,7 @@ if categorie == 'Technical':
 
         #display fbprophet:
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader('Based on historical price only')
             st.markdown("Note that the output can take time.")
 
@@ -360,7 +360,7 @@ if categorie == 'Technical':
 
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
             
@@ -497,7 +497,7 @@ if categorie == 'Technical':
         
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
             
@@ -618,7 +618,7 @@ if categorie == 'Technical':
                     use_container_width=True)     
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
             
@@ -736,7 +736,7 @@ if categorie == 'Technical':
                     use_container_width=True)     
             
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
             
@@ -866,7 +866,7 @@ elif categorie == 'Macro':
                             use_container_width=True)   
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader('Based on historical price and its correlation with M2 (Eur + USD)')
             st.markdown("Note that the output can take time.")
 
@@ -1028,7 +1028,7 @@ elif categorie == 'Macro':
 
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
             
@@ -1199,7 +1199,7 @@ elif categorie == 'Mining':
 
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
 
@@ -1348,7 +1348,7 @@ elif categorie == 'Mining':
                         use_container_width=True)   
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
 
@@ -1479,7 +1479,7 @@ elif categorie == 'Mining':
                                 use_container_width=True)   
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {indicateur}')
             st.markdown("Note that the output can take time.")
 
@@ -1630,7 +1630,7 @@ elif categorie == 'On-Chain':
 
 
             with tab2:
-                st.title(':blue[Prediction based on fbprophet]')
+                st.title(':blue[Prediction based on machine learning]')
                 st.subheader(f'Based on historical price and its correlation with {metrics}')
                 st.subheader(':red[Attention, only 2000 days of data !]')
                 st.markdown("Note that the output can take time.")
@@ -1752,7 +1752,7 @@ elif categorie == 'On-Chain':
 
 
             with tab2:
-                st.title(':blue[Prediction based on fbprophet]')
+                st.title(':blue[Prediction based on machine learning]')
                 st.subheader(f'Based on historical price and its correlation with {metrics}')
                 st.subheader(':red[Attention, only 2000 days of data !]')
                 st.markdown("Note that the output can take time.")
@@ -1901,7 +1901,7 @@ elif categorie == 'On-Chain':
 
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {metrics}')
             st.markdown("Note that the output can take time.")
             
@@ -2018,7 +2018,7 @@ elif categorie == 'On-Chain':
 
 
         with tab2:
-            st.title(':blue[Prediction based on fbprophet]')
+            st.title(':blue[Prediction based on machine learning]')
             st.subheader(f'Based on historical price and its correlation with {metrics}')
             st.markdown("Note that the output can take time.")
             
