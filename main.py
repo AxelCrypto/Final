@@ -96,7 +96,7 @@ else:
             type_balance = st.selectbox("**Type of Balances**", ('Adresses Count','Balances'))
             metrics = st.selectbox("**metrics**", ('<0.01','0.01 - 0.1','0.1 - 1', '1 - 10', '10 - 100','100 - 1000', '1k - 10k','10k+'))
         elif onchain == 'transactions':
-            metrics = st.selectbox("**metrics**", ('count','size_mean','count'))
+            metrics = st.selectbox("**metrics**", ('count','size_mean'))
         elif onchain == 'indicators':
             metrics = st.selectbox("**metrics**", ('sopr',
                                                    'stock_to_flow_ratio'
@@ -966,8 +966,6 @@ elif categorie == 'Macro':
                 
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
                 st.plotly_chart(fig2)
-
-
 
     elif indicateur == 'DXY': 
 

@@ -9,12 +9,12 @@ from functions.get_M2 import *
 
 def merged_btc_M2s():
     # importing Bitcoin's price DF 
-    sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/streamlit')
+  #  sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/streamlit')
     df = btc()
     df_btc = pd.DataFrame(df)
 
     # importing M2_USD price 
-    sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/streamlit')
+  #  sys.path.insert(0, 'C:/Users/axell/Documents/BitcoinML/streamlit')
     df = M2_usd()
     df_M2_usd = pd.DataFrame(df)
 
