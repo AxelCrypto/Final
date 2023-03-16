@@ -54,7 +54,7 @@ categorie = st.sidebar.selectbox("**catégorie**", ('Technique', 'Macro', 'Minin
 
 if categorie == 'Technique':
 
-    with st.sidebar.form("Indicateurs"):
+    with st.sidebar.form("Indicators"):
         indicateur = st.selectbox('Technical Indicators', ('Price', 'Price pattern', 'Bull-Market Support Bands', 'EHMA', 'Mayer Multiple', 'Puell Multiple'))
 
         checkbox_val = st.checkbox("Logarithmic")
