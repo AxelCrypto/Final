@@ -122,7 +122,7 @@ else:
 st.sidebar.markdown('''
 ---
 GM Satoshi 🕵️  
-By: **[Axel](https://twitter.com/AxelCryptoytb)**    
+By **[Axel](https://twitter.com/AxelCryptoytb)**    
 *Data should NOT be used for trading and investing.*
 ''')
 
