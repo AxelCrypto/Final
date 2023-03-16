@@ -122,8 +122,8 @@ else:
 st.sidebar.markdown('''
 ---
 GM Satoshi 🕵️  
-By [Axel](https://twitter.com/AxelCryptoytb).    
-Data should NOT be used for trading and investing.
+By: **[Axel](https://twitter.com/AxelCryptoytb)**    
+*Data should NOT be used for trading and investing.*
 ''')
 
 
@@ -1030,7 +1030,7 @@ elif categorie == 'Macro':
             dxy = dxy[-days_to_plot:]
             df_btc = df_btc[-days_to_plot_btc:]
 
-            
+
             st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
                         use_container_width=True)   
 
