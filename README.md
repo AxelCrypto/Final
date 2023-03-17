@@ -2,6 +2,8 @@
 
 #### What if you could analyse Bitcoin's price influencers in one place ? 🔥
 
+[![Website](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://axelcrypto-final-main-developper-11jwc8.streamlit.app/)
+
 ## Bitcoin's price influencers ⬇️
 Bitcoin's price is mostly influenced by the following factors:   
 - Psychological factors: technical analytics reflects it
