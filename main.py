@@ -31,9 +31,7 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://twitter.com/AxelCryptoytb',
         'Report a bug': "https://twitter.com/AxelCryptoytb",
-        'About': "Welcome into bitcoin's price rabbit hole. This is a simple app to help you visualise bitcoin's prices influencers.",
-        Bitcoin vu de l'intérieur. Toutes ces données sont purement informatives et rien n'est à prendre en compte comme un conseil en investissement. *@AxelCrypto*"
-    }
+        'About': "Welcome into bitcoin's price rabbit hole. This is a simple app to help you visualise bitcoin's prices influencers. Nothing can be taken for a financial advise. *@AxelCrypto*"    }
 )
 
 #Options download
@@ -2102,4 +2100,7 @@ elif categorie == 'On-Chain':
                 fig2 = plot_components_plotly(model, prediction)
                 
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
-                st.plotly_chart
+                st.plotly_chart(fig2)
+                
+
+
