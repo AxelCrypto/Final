@@ -125,7 +125,7 @@ By **[Axel](https://twitter.com/AxelCryptoytb)**
 *Data should NOT be used for trading and investing.*
 ''')
 
-#st.sidebar.markdown('Last Update: 16/03/2023')
+st.sidebar.markdown(f'Last Update: {df_btc.index[-1]}')
 
 
 # Charts selon la selection:
