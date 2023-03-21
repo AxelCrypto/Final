@@ -84,7 +84,14 @@ def get_all_data_DXY():
     dxy.to_csv('data/datos/dxy.csv')
 
 def get_all_data_blockchain(categorie, indicateur):
-    url = "https://api.blockchain.info/charts/hash-rate"
+    if indicateur == 'unique-addresses':
+        indicateur = 'n-unique-addresses'
+    elif indicateur == 'Hashrate':
+        indicateur = 'hash-rate'
+    elif indicateur == 'Total Transaction Fees (BTC)':
+        indicateur = 'transaction-fees'
+        
+    url = f"https://api.blockchain.info/charts/{indicateur}"
     params = {"timespan": "all", "format": "json"}
     response = requests.get(url, params=params)
 
@@ -101,6 +108,7 @@ def get_all_data_blockchain(categorie, indicateur):
     df_btc.index = pd.to_datetime(df_btc.index)
     df = df_btc.merge(data, left_index= True, right_index= True)
     df.to_csv(f'data/datos/{categorie}_{indicateur}.csv')
+   
 
 def get_all_data_s2f(categorie, indicateur):
     df_merged = glassnode('/v1/metrics/indicators/stock_to_flow_ratio')

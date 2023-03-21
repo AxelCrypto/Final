@@ -19,7 +19,6 @@ def glassnode(url):
         params={'a': 'BTC', 'api_key': API_KEY})
     
 
-
     # convert to pandas dataframe
     df = pd.read_json(res.text, convert_dates=['t'])
     time.sleep(1)
