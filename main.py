@@ -1291,7 +1291,7 @@ elif categorie == 'Mining':
     elif indicateur == 'Total Transaction Fees (BTC)': 
 
         try : 
-            df = pd.read_csv(f'data/datos/merged_{categorie}_{indicateur}.csv', index_col='timestamp')
+            df = pd.read_csv(f'data/datos/{categorie}_{indicateur}.csv', index_col='timestamp')
 
         except:
             # Define the API endpoint and parameters
