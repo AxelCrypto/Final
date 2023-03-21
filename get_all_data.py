@@ -85,13 +85,13 @@ def get_all_data_DXY():
 
 def get_all_data_blockchain(categorie, indicateur):
     if indicateur == 'unique-addresses':
-        indicateur = 'n-unique-addresses'
+        ind = 'n-unique-addresses'
     elif indicateur == 'Hashrate':
-        indicateur = 'hash-rate'
+        ind = 'hash-rate'
     elif indicateur == 'Total Transaction Fees (BTC)':
-        indicateur = 'transaction-fees'
+        ind = 'transaction-fees'
         
-    url = f"https://api.blockchain.info/charts/{indicateur}"
+    url = f"https://api.blockchain.info/charts/{ind}"
     params = {"timespan": "all", "format": "json"}
     response = requests.get(url, params=params)
 
