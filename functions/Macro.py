@@ -77,13 +77,13 @@ def macro_dxy(df, dxy, log_scale: bool, log_scale_metric: bool, ma : int, z_scor
             fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='log'), yaxis2=dict(title='metric', overlaying='y', side='right'))
             fig.add_trace(go.Line(x=dxy.index, 
                                          #open=dxy['Open'], high=dxy['High'], low=dxy['Low'], 
-                                         y=((dxy['Close'] - dxy['Close'].rolling(ma).mean()) / dxy['Close'].rolling(ma).std()).rolling(7).mean(), name='DXY', yaxis='y2'), row=1, col=1, secondary_y=False)
+                                         y=dxy['Close'].rolling(ma).mean(), name='DXY', yaxis='y2'), row=1, col=1, secondary_y=False)
 
         if log_scale == False:
             fig.update_layout(xaxis=dict(title='Date'), yaxis=dict(title='Price', type='linear'), yaxis2=dict(title='metric', overlaying='y', side='right'))
             fig.add_trace(go.Line(x=dxy.index, 
                                          #open=dxy['Open'], high=dxy['High'], low=dxy['Low'], 
-                                         y=((dxy['Close'] - dxy['Close'].rolling(ma).mean()) / dxy['Close'].rolling(ma).std()).rolling(7).mean(), name='DXY', yaxis='y2'), row=1, col=1, secondary_y=False)
+                                         y=dxy['Close'].rolling(ma).mean(), name='DXY', yaxis='y2'), row=1, col=1, secondary_y=False)
 
     else:
         if log_scale == True:

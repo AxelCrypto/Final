@@ -19,6 +19,7 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 from prophet.plot import plot_plotly, plot_components_plotly
 import plotly.graph_objs as go
+import json
 
 
 df_btc = btc()
@@ -970,7 +971,6 @@ elif categorie == 'Macro':
     elif indicateur == 'DXY': 
 
         st.header('Bitcoin vs `USD Value Index`')  
-        checkbox_zscore = st.sidebar.checkbox("Activate Z-Score")
 
         try:
             dxy = pd.read_csv('data/datos/dxy.csv', index_col= 'Date')
@@ -986,15 +986,27 @@ elif categorie == 'Macro':
                 'If the index is :red[rising], it means that the dollar is strengthening against the basket - and vice-versa.\n\n'
                 'USD tends to appreciate in a deleveraging and derisking period. :bear:\n\n'
                 'USD tends to depreciate in a risk-taking period with low interest rates and quantitative easing. :money_with_wings:')
+        
+        
+       
 
+    
+        col1, col2 = st.columns(2)
+        
+        col1.metric( days = st.number_input(
+                'Number of days to compare',
+                min_value=1,
+                max_value=3650,
+                value=30,
+                step=1
+            ))
+        
+        f = open('backtesting/correlations_raw.json')
+        data = json.load(f)
+        
 
-        days = st.number_input(
-            'Number of days to compare',
-            min_value=1,
-            max_value=3650,
-            value=30,
-            step=1
-        )
+        col2.metric('Correlation coefficient: ', data['dxy'])
+
 
 
         if st.button('**Evaluate the current situation**'):
@@ -1030,7 +1042,7 @@ elif categorie == 'Macro':
             df_btc = df_btc[-days_to_plot_btc:]
 
 
-            st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma, checkbox_zscore),
+            st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
                         use_container_width=True)   
 
 
