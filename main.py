@@ -1929,6 +1929,7 @@ elif categorie == 'On-Chain':
 
         st.write('Total number of unique addresses used on the blockchain. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
        
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw['On-Chain_unique-addresses'],2))
         
         days = st.number_input(
             'Number of days to compare',
@@ -2045,6 +2046,9 @@ elif categorie == 'On-Chain':
     else:
         df = on_chain_merge(onchain, metrics)
         st.header(f'You are looking at `{metrics}` from the category `{onchain}`')
+
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw[f'merged_{onchain}_{metrics}'],2))
+
 
         days = st.number_input(
             'Number of days to compare',
