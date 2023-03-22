@@ -1654,6 +1654,11 @@ elif categorie == 'On-Chain':
 
             st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw[ind],2))
 
+            if st.button('**Evaluate the current situation**'):
+                if df['addressesCount_f_10000_to_100000'].iloc[-1] < df ['addressesCount_f_10000_to_100000'].iloc[-30]:
+                    st.subheader(f"The number of 10k to 100k btc addresses, which have the highest anti correlation, are :green[decreasing] since the 30 last days. :rocket:")
+                else :
+                    st.subheader(f"The number of 10k to 100k btc addresses, which have the highest anti correlation, are :red[increasing] since the 30 last days. :bear:")
 
             tab1, tab2= st.tabs(["Chart", "Prediction"])
 
