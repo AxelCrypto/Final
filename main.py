@@ -21,6 +21,8 @@ from prophet.plot import plot_plotly, plot_components_plotly
 import plotly.graph_objs as go
 import json
 
+correlations_raw = open('backtesting/correlations_raw.json')
+corr_raw = json.load(correlations_raw)
 
 df_btc = btc()
 
@@ -1172,8 +1174,10 @@ elif categorie == 'Mining':
                     '- may indicate an increased demand for Bitcoin  \n\n'
                     "- makes the Bitcoin's network more secure :mechanical_arm:" 
         )
+        correlations_raw = open('backtesting/correlations_raw.json')
+        corr_raw = json.load(correlations_raw)
 
-        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['Mining_Hashrate'],2))
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw['Mining_Hashrate'],2))
 
 
         days = st.number_input(
@@ -1336,7 +1340,7 @@ elif categorie == 'Mining':
                     'Increase = :green[higher] demand :man-woman-girl-girl: \n\n'
         )
 
-        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['Mining_Total Transaction Fees (BTC)'],2))
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw['Mining_Total Transaction Fees (BTC)'],2))
 
 
         days = st.number_input(
@@ -1470,7 +1474,7 @@ elif categorie == 'Mining':
         st.header(f'You are looking at `{indicateur}` from the category `mining`')
         st.write('The total amount of fees paid to miners. Inflation rewards not included. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
 
-        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['merged_fees_volume_sum'],2))
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw['merged_fees_volume_sum'],2))
 
         days = st.number_input(
             'Number of days to compare',
