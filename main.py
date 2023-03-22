@@ -828,6 +828,13 @@ elif categorie == 'Macro':
         st.write('Traditional currency can be "printed" without limits by central banks.\n\n'
            'The `higher` M2 goes, the `higher` bitcoin price could go. When central banks end easing and start to hike rates, bitcoin price could :red[drop].')
 
+        f = open('backtesting/correlations_raw.json')
+        data = json.load(f)
+
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['merged_M2s'],2))
+
+
+
         df_usd = pd.DataFrame(M2_usd())
         df_eur = pd.DataFrame(M2_ecb())
         df_btc.index = pd.to_datetime(df_btc.index)
@@ -1166,6 +1173,9 @@ elif categorie == 'Mining':
                     "- makes the Bitcoin's network more secure :mechanical_arm:" 
         )
 
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['Mining_Hashrate'],2))
+
+
         days = st.number_input(
             'Number of days to compare',
             min_value=1,
@@ -1326,6 +1336,9 @@ elif categorie == 'Mining':
                     'Increase = :green[higher] demand :man-woman-girl-girl: \n\n'
         )
 
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['Mining_Total Transaction Fees (BTC)'],2))
+
+
         days = st.number_input(
             'Number of days to compare',
             min_value=1,
@@ -1457,6 +1470,7 @@ elif categorie == 'Mining':
         st.header(f'You are looking at `{indicateur}` from the category `mining`')
         st.write('The total amount of fees paid to miners. Inflation rewards not included. Increasing = :green[Higher Demand] decreasing = :red[Lower Demand]')
 
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['merged_fees_volume_sum'],2))
 
         days = st.number_input(
             'Number of days to compare',
