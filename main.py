@@ -990,19 +990,20 @@ elif categorie == 'Macro':
         
        
 
-    
         col1, col2 = st.columns(2)
-        
-        col1.metric( days = st.number_input('Number of days to compare',
-                min_value=1,
-                max_value=3650,
-                value=30,
-                step=1
-            ))
-        
+
+        days = st.number_input('Number of days to compare',
+                            min_value=1,
+                            max_value=3650,
+                            value=30,
+                            step=1)
+
+        col1.metric('Days', days)
+
+
+                
         f = open('backtesting/correlations_raw.json')
         data = json.load(f)
-        
 
         col2.metric('Correlation coefficient: ', data['dxy'])
 
