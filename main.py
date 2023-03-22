@@ -993,8 +993,7 @@ elif categorie == 'Macro':
     
         col1, col2 = st.columns(2)
         
-        col1.metric( days = st.number_input(
-                'Number of days to compare',
+        col1.metric( days = st.number_input('Number of days to compare',
                 min_value=1,
                 max_value=3650,
                 value=30,
