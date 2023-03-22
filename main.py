@@ -987,26 +987,19 @@ elif categorie == 'Macro':
                 'USD tends to appreciate in a deleveraging and derisking period. :bear:\n\n'
                 'USD tends to depreciate in a risk-taking period with low interest rates and quantitative easing. :money_with_wings:')
         
-        
+                
+        f = open('backtesting/correlations_raw.json')
+        data = json.load(f)
+
+        st.write("*The correlation coefficient with bitcoin's price is of : *", data['dxy'])
+
+
        
-
-        col1, col2 = st.columns(2)
-
         days = st.number_input('Number of days to compare',
                             min_value=1,
                             max_value=3650,
                             value=30,
                             step=1)
-
-        col1.metric('Days', days)
-
-
-                
-        f = open('backtesting/correlations_raw.json')
-        data = json.load(f)
-
-        col2.metric('Correlation coefficient: ', data['dxy'])
-
 
 
         if st.button('**Evaluate the current situation**'):
