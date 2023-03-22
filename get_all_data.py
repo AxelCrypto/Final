@@ -202,7 +202,7 @@ def run_all():
     time.sleep(60)
     get_all_data_onchain('institutions', 'purpose_etf_holdings_sum')
     get_all_data_onchain('market', 'marketcap_usd')
-    get_all_data_onchain('market', 'marketcap_usd')
+    get_all_data_onchain('market', 'price_drawdown_relative')
     get_all_data_onchain('supply', 'active_more_1y_percent')
     get_all_data_onchain('transactions', 'count')
     get_all_data_onchain('transactions', 'size_mean')
