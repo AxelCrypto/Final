@@ -970,6 +970,7 @@ elif categorie == 'Macro':
     elif indicateur == 'DXY': 
 
         st.header('Bitcoin vs `USD Value Index`')  
+        checkbox_zscore = st.checkbox("Activate Z-Score")
 
         try:
             dxy = pd.read_csv('data/datos/dxy.csv', index_col= 'Date')
