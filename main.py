@@ -1646,10 +1646,10 @@ elif categorie == 'On-Chain':
             bal_dic=  {'<0.01':'less_than_0_01', '0.01 - 0.1': 'f_0_01_to_0_1' ,'0.1 - 1': 'f_0_1_to_1', '1 - 10' : 'f_1_to_10', '10 - 100' : 'f_10_to_100','100 - 1000' : 'f_100_to_1000', '1k - 10k' : 'f_1000_to_10000','10k+' : 'f_10000_to_100000'}
 
             if type_balance == 'Adresses Count':
-                ind = 'addressesCount_' + bal_dic[metric]
+                ind = 'addressesCount_' + bal_dic[metrics]
 
             elif type_balance == 'Balances':
-                ind = 'totalVolume_' + bal_dic[metric]
+                ind = 'totalVolume_' + bal_dic[metrics]
 
 
             st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw[ind],2))
@@ -1770,10 +1770,10 @@ elif categorie == 'On-Chain':
             bal_dic=  {'<0.01':'less_than_0_01', '0.01 - 0.1': 'f_0_01_to_0_1' ,'0.1 - 1': 'f_0_1_to_1', '1 - 10' : 'f_1_to_10', '10 - 100' : 'f_10_to_100','100 - 1000' : 'f_100_to_1000', '1k - 10k' : 'f_1000_to_10000','10k+' : 'f_10000_to_100000'}
 
             if type_balance == 'Adresses Count':
-                ind = 'addressesCount_' + bal_dic[metric]
+                ind = 'addressesCount_' + bal_dic[metrics]
 
             elif type_balance == 'Balances':
-                ind = 'totalVolume_' + bal_dic[metric]
+                ind = 'totalVolume_' + bal_dic[metrics]
 
 
             st.write("The correlation coefficient with bitcoin's price is of : ", round(corr_raw[ind],2))
