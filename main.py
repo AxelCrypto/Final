@@ -970,7 +970,7 @@ elif categorie == 'Macro':
     elif indicateur == 'DXY': 
 
         st.header('Bitcoin vs `USD Value Index`')  
-        checkbox_zscore = st.checkbox("Activate Z-Score")
+        checkbox_zscore = st.sidebar.checkbox("Activate Z-Score")
 
         try:
             dxy = pd.read_csv('data/datos/dxy.csv', index_col= 'Date')
@@ -1030,7 +1030,7 @@ elif categorie == 'Macro':
             df_btc = df_btc[-days_to_plot_btc:]
 
 
-            st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma ),
+            st.plotly_chart(macro_dxy(df_btc,dxy,checkbox_val, checkbox_val_metric, ma, checkbox_zscore),
                         use_container_width=True)   
 
 
