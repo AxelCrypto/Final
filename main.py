@@ -991,7 +991,7 @@ elif categorie == 'Macro':
         f = open('backtesting/correlations_raw.json')
         data = json.load(f)
 
-        st.write("*The correlation coefficient with bitcoin's price is of : *", data['dxy'])
+        st.write("The correlation coefficient with bitcoin's price is of : ", round(data['dxy'],2))
 
 
        
