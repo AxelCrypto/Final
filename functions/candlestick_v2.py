@@ -177,7 +177,7 @@ def get_candlestick_plot_EHMA(df: pd.DataFrame, log_scale: bool, ticker: str = '
     fig.update_xaxes(showticklabels=True, tickformat="%Y-%m-%d")
 
     # Add EHMA indicator
-    period = 180
+    period = 20
     yukdus = True
     sqrt_period = np.sqrt(period)
 
