@@ -25,6 +25,7 @@ correlations_raw = open('backtesting/correlations_raw.json')
 corr_raw = json.load(correlations_raw)
 
 df_btc = btc()
+df_btc.drop_duplicates(inplace=True)
 
 st.set_page_config(
     page_title="Inside Bitcoin's Price Rabbit hole",
