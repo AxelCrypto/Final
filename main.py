@@ -460,7 +460,7 @@ if categorie == 'Technical':
         df = df_btc.copy()
 
         # Add EHMA indicator
-        period = 180
+        period = 120
         yukdus = True
         sqrt_period = np.sqrt(period)
 
@@ -490,7 +490,7 @@ if categorie == 'Technical':
 
 
 
-        tab1, tab2= st.tabs(["Chart", "Prediction"])
+        tab1, tab2, tab3= st.tabs(["Chart", "Prediction", 'Backtesting'])
 
         with tab1:
             days_to_plot = st.slider(
@@ -591,6 +591,13 @@ if categorie == 'Technical':
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
                 st.plotly_chart(fig2)
                 
+        with tab3:
+            st.title(':blue[Backtesting]')
+            st.subheader(f'Long when green, short otherwise')
+            
+            st.image('backtesting/plots/ehma.png')
+
+
 
     elif indicateur == 'Mayer Multiple':
         st.header('Bitcoin `Mayer Multiple`')
