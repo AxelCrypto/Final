@@ -350,7 +350,7 @@ if categorie == 'Technical':
 
 
 
-        tab1, tab2= st.tabs(["Chart", "Prediction"])
+        tab1, tab2, tab3 = st.tabs(["Chart", "Prediction", 'Backtesting'])
 
 
         with tab1:
@@ -445,7 +445,15 @@ if categorie == 'Technical':
                 
                 st.subheader(':blue[:Historical seasonalities detected by the model: ]')
                 st.plotly_chart(fig2)
-                
+
+
+        with tab3:
+            st.title(':blue[Backtesting]')
+            st.subheader(f'Long when price above {indicateur}, short otherwise')
+            
+            st.image('backtesting/plots/Bull_Market_Support_Bands.png')
+
+
     elif indicateur == 'EHMA': 
         st.header('Bitcoin `EHMA`')
 
